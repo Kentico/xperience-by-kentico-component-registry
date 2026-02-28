@@ -5,8 +5,6 @@ using CMS.DataEngine;
 using CMS.Membership;
 using CMS.Websites;
 
-using Kentico.Xperience.ComponentRegistry;
-
 using Kentico.Content.Web.Mvc.Internal;
 
 using Microsoft.Extensions.Configuration;

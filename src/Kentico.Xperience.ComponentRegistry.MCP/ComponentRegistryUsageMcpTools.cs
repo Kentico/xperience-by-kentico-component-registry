@@ -1,7 +1,5 @@
 using System.ComponentModel;
 
-using Kentico.Xperience.ComponentRegistry;
-
 using ModelContextProtocol.Server;
 
 namespace Kentico.Xperience.ComponentRegistry.MCP;

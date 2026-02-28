@@ -1,7 +1,5 @@
 using Kentico.Xperience.ComponentRegistry.MCP;
 
-using ModelContextProtocol.Server;
-
 namespace Microsoft.Extensions.DependencyInjection;
 
 /// <summary>
