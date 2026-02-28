@@ -41,18 +41,17 @@ SQL Server 2019 or newer compatible database
 Running the sample project requires creating a new Xperience by Kentico database using the included template.
 
 Change directory in your console to `./examples/DancingGoat` and follow the instructions in the Xperience
-documentation on [creating a new database](https://docs.xperience.io/xp26/developers-and-admins/installation#Installation-CreatetheprojectdatabaseCreateProjectDatabase).
+documentation on [creating a new database](https://docs.kentico.com/documentation/developers-and-admins/installation#create-the-project-database).
 
 ### Admin Customization
 
-To run the Sample app Admin customization in development mode, add the following to your [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-7.0&tabs=windows#secret-manager) for the application.
+To run the Sample app Admin customization in development mode, add the following to your [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-10.0&tabs=windows#secret-manager) for the application.
 
 ```json
 "CMSAdminClientModuleSettings": {
-   "xperience-community-component-registry-web-admin": {
+   "kentico-xperience-integrations-component-registry-web-admin": {
       "Mode": "Proxy",
-      "Port": 3019,
-      "UseSSL": true
+      "Port": 3045
    }
 }
 ```
