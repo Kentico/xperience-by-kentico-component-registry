@@ -78,6 +78,7 @@ builder.Services.AddComponentRegistry();
 if (builder.Environment.IsDevelopment())
 {
     builder.Services
+        .AddComponentRegistryMcpServices()
         .AddMcpServer()
         .WithHttpTransport()
         .WithComponentRegistryTools();

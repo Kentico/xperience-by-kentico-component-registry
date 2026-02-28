@@ -30,32 +30,9 @@ public record WebPageUrlResponse(
     int WebPageItemId,
     string LanguageName,
     bool IsPublished,
-    string? UrlType,
     string? Url,
     bool Success,
-    string? ErrorMessage,
-    string? PreviewUrlState = null);
-
-/// <summary>
-/// Possible URL types returned by the web page URL tool.
-/// </summary>
-public static class WebPageUrlType
-{
-    public const string Published = "Published";
-    public const string Preview = "Preview";
-    public const string ShareablePreview = "ShareablePreview";
-}
-
-/// <summary>
-/// Possible states returned for a preview URL request.
-/// </summary>
-public static class PreviewUrlState
-{
-    public const string Existing = "Existing";
-    public const string Generated = "Generated";
-    public const string Removed = "Removed";
-    public const string NotFound = "NotFound";
-}
+    string? ErrorMessage);
 
 internal static class ComponentRegistryMcpToolsValidation
 {

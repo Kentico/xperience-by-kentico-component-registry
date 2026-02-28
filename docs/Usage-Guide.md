@@ -14,6 +14,12 @@ If you wish to separately install just the registry services, you can use the fo
 dotnet add package Kentico.Xperience.ComponentRegistry
 ```
 
+If you want to expose MCP tools, add:
+
+```powershell
+dotnet add package Kentico.Xperience.ComponentRegistry.MCP
+```
+
 ## Quick Start
 
 Register the library's services in your ASP.NET Core application:
@@ -24,14 +30,6 @@ Register the library's services in your ASP.NET Core application:
 // ...
 
 builder.Services.AddComponentRegistry();
-
-if (builder.Environment.IsDevelopment())
-{
-  builder.Services
-    .AddMcpServer()
-    .WithHttpTransport()
-    .WithComponentRegistryTools();
-}
 ```
 
 Run the application and navigate to the "Component Registry" application in the Xperience administration under the "Development" category.
@@ -40,35 +38,20 @@ You can control access to Component Registry application and each of the 3 regis
 
 ### MCP endpoint (optional)
 
-MCP support is disabled by default.
+```csharp
+// Program.cs
 
-Add configuration:
+// ...
 
-```json
+if (builder.Environment.IsDevelopment())
 {
-  "Kentico": {
-    "Xperience": {
-      "ComponentRegistry": {
-        "Mcp": {
-          "AgentAdminUserName": "mcpAgent"
-        }
-      }
-    }
-  }
+  builder.Services
+    .AddComponentRegistryMcpServices()
+    .AddMcpServer()
+    .WithHttpTransport()
+    .WithComponentRegistryTools();
 }
 ```
-
-### MCP agent administration user (required for preview URLs)
-
-The `component_registry_get_web_page_preview_url` tool generates shareable preview links using a real Xperience administration user account.
-
-1. In Xperience administration, create a dedicated administration user for MCP automation (for example `mcpAgent`).
-1. Give the user enough permissions to generate preview URLs for all web pages across all channels.
-1. Set the same username in configuration under `Kentico:Xperience:ComponentRegistry:Mcp:AgentAdminUserName`.
-1. Keep this user dedicated to MCP operations (recommended: do not use a personal account).
-1. Do not deploy this account to a non-local environment. It is for development-only workflows.
-
-If this user is missing (or the username is not configured), preview URL generation returns `Success: false` with an actionable message telling you to create or configure the user.
 
 Map endpoint in request pipeline:
 
@@ -86,9 +69,9 @@ Example: VS Code and GitHub Copilot `.vscode/mcp.json`
 ```json
 {
   "servers": {
-    "xperience-community.component-registry": {
+    "your-app": {
       "type": "http",
-      "url": "http://localhost:53856/mcp"
+      "url": "http://localhost:18319/mcp"
     }
   }
 }
@@ -111,7 +94,7 @@ Example: VS Code and GitHub Copilot `.vscode/mcp.json`
 
 ## MCP Tools Reference
 
-When MCP support is enabled (via `appsettings.json`), the following tools are exposed through an HTTP endpoint to enable AI agents and other clients to discover and interact with component registrations.
+When MCP support is enabled, the following tools are exposed through an HTTP endpoint to enable AI agents and other clients to discover and interact with component registrations.
 
 ### component_registry_list_definitions
 
@@ -153,7 +136,10 @@ Gets detailed usage information for a specific component identifier across all p
 **Parameters:**
 
 - `builder` (string, required): Builder type - `page`, `email`, or `form`
-- `componentType` (string, required): Component type - `widget`, `template`, `page-template`, `component`, or `section`
+- `componentType` (string, required): Supported combinations:
+  - `page`: `widget`, `page-template`
+  - `email`: `widget`, `template`
+  - `form`: `component`, `section`
 - `componentIdentifier` (string, required): The unique identifier of the component
 
 **Returns:** Varies by builder type:
@@ -162,7 +148,7 @@ Gets detailed usage information for a specific component identifier across all p
 - **Email Builder**: `EmailConfigurationUsageDetailDto` - Contains `TotalEmailConfigurationsUsing`, `TotalVariants`, and list of `EmailConfigurations` with their `Variants`
 - **Form Builder**: `FormComponentUsageDetailDto` - Contains `TotalFormClassesUsing`, `TotalFormBuilderFormsUsing`, and lists of `FormClasses` and `FormBuilderForms`
 
-Each variant includes:
+For Page and Email usage details, each variant includes:
 
 - `LanguageName`: Display name of the language (e.g., "English (United States)")
 - `IsPublished`: Whether the variant is published
@@ -186,145 +172,63 @@ Gets page builder usage details for multiple widget or page template identifiers
 
 ### component_registry_get_web_page_url
 
-Gets the absolute published URL for a web page by its ID and language, enabling agents to visit and validate published rendering.
+Gets a web page URL for either a published or unpublished variant by page ID and language.
 
 **Parameters:**
 
 - `webPageItemId` (int, required): The web page item ID from usage data (e.g., from `PageUsageDto.WebPageItemId`)
 - `languageName` (string, required): Language name (e.g., "en-US")
+- `isPublished` (bool, required): `true` to return the published URL, `false` to return a preview URL for unpublished changes
 
 **Returns:** `WebPageUrlResponse`
+
+Example for a published URL (`isPublished: true`):
 
 ```json
 {
   "WebPageItemId": 123,
   "LanguageName": "en-US",
   "IsPublished": true,
-  "UrlType": "Published",
   "Url": "https://example.com/en-US/page-123",
   "Success": true,
   "ErrorMessage": null
 }
 ```
 
-### component_registry_get_web_page_preview_url
-
-Gets a shareable preview URL for unpublished page changes by web page item ID and language.
-
-**Parameters:**
-
-- `webPageItemId` (int, required): The web page item ID from usage data (e.g., from `PageUsageDto.WebPageItemId`)
-- `languageName` (string, required): Language name (e.g., "en-US")
-
-**Returns:** `WebPageUrlResponse`
+Example for a preview URL (`isPublished: false`):
 
 ```json
 {
   "WebPageItemId": 123,
   "LanguageName": "en-US",
   "IsPublished": false,
-  "UrlType": "ShareablePreview",
   "Url": "https://example.com/preview/abc123def456",
   "Success": true,
-  "ErrorMessage": null,
-  "PreviewUrlState": "Existing"
+  "ErrorMessage": null
 }
 ```
 
-Possible `PreviewUrlState` values:
-
-- `Existing`: A shareable preview URL already existed for the language variant.
-- `Generated`: A new shareable preview URL was generated by this call.
-- `Removed`: A shareable preview URL was removed by a cleanup call.
-- `NotFound`: No shareable preview URL existed to remove.
-
-Example when the configured MCP agent user is missing:
+Example when preview URL generation fails (`isPublished: false`):
 
 ```json
 {
   "WebPageItemId": 123,
   "LanguageName": "en-US",
   "IsPublished": false,
-  "UrlType": null,
   "Url": null,
   "Success": false,
-  "ErrorMessage": "Preview URL requires administration user 'mcpAgent'. Create this user in Xperience administration (or update Kentico:Xperience:ComponentRegistry:Mcp:AgentAdminUserName) to enable preview URL generation.",
-  "PreviewUrlState": null
+  "ErrorMessage": "Preview URL could not be generated for the requested page."
 }
 ```
 
-**URL Types:**
-
-- `Published`: Standard live page URL for published content
-- `ShareablePreview`: Temporary preview link for unpublished draft changes
-
-**Example use case:** After discovering a widget is used on specific pages, call `component_registry_get_web_page_url` for published variants and `component_registry_get_web_page_preview_url` for draft variants based on `PageVariantDto.IsPublished`.
-
-### component_registry_remove_web_page_preview_url
-
-Removes the shareable preview URL for a page language variant to clean up preview links generated by prior MCP calls.
-
-**Parameters:**
-
-- `webPageItemId` (int, required): The web page item ID from usage data (e.g., from `PageUsageDto.WebPageItemId`)
-- `languageName` (string, required): Language name (e.g., "en-US")
-
-**Returns:** `WebPageUrlResponse`
-
-Example when a preview URL is removed:
-
-```json
-{
-  "WebPageItemId": 123,
-  "LanguageName": "en-US",
-  "IsPublished": false,
-  "UrlType": "ShareablePreview",
-  "Url": null,
-  "Success": true,
-  "ErrorMessage": null,
-  "PreviewUrlState": "Removed"
-}
-```
-
-Example when there was nothing to remove:
-
-```json
-{
-  "WebPageItemId": 123,
-  "LanguageName": "en-US",
-  "IsPublished": false,
-  "UrlType": "ShareablePreview",
-  "Url": null,
-  "Success": true,
-  "ErrorMessage": null,
-  "PreviewUrlState": "NotFound"
-}
-```
-
-Example when the configured MCP agent user is missing:
-
-```json
-{
-  "WebPageItemId": 123,
-  "LanguageName": "en-US",
-  "IsPublished": false,
-  "UrlType": null,
-  "Url": null,
-  "Success": false,
-  "ErrorMessage": "Preview URL cleanup requires administration user 'mcpAgent'. Create this user in Xperience administration (or update Kentico:Xperience:ComponentRegistry:Mcp:AgentAdminUserName) to enable preview URL cleanup.",
-  "PreviewUrlState": null
-}
-```
-
-**Example use case:** After validating draft rendering with `component_registry_get_web_page_preview_url`, call `component_registry_remove_web_page_preview_url` to clean up temporary shareable preview links.
+**Example use case:** After discovering a widget is used on specific pages, call `component_registry_get_web_page_url` with `isPublished: true` for published variants and `isPublished: false` for draft variants based on `PageVariantDto.IsPublished`.
 
 ### Complete Workflow Example
 
 1. **Discover components**: Use `component_registry_list_definitions` to find all page widgets
 2. **Find usage**: Use `component_registry_get_usage` to see which pages use a specific widget
-3. **Get URLs**: Use `component_registry_get_web_page_url` for published variants and `component_registry_get_web_page_preview_url` for unpublished variants
+3. **Get URLs**: Use `component_registry_get_web_page_url` with `isPublished` set from each variant's status
 4. **Visit & validate**: Navigate to the returned URLs to inspect component rendering in published or preview mode
-5. **Cleanup preview links** (optional): Use `component_registry_remove_web_page_preview_url` for preview URLs you no longer need
 
 This enables AI agents to autonomously discover, analyze, and validate component implementations across your Xperience application.
 
@@ -352,3 +256,19 @@ IEnumerable<Assembly> assemblies = [...];
 
 builder.Services.AddComponentRegistry(assemblies);
 ```
+
+## Agent scenario
+
+The following is a scenario you can try with an AI agent to showcase the value of the component registry and MCP server.
+
+Enter the following prompt:
+
+> use the dancing goat mcp server to tell me if the DancingGoat.General.CTAButtonWidget widget is in use in any unpublished pages
+
+> if so, get the url of that page and use the chrome dev tools mcp server to take a screenshot of that page and validate the widget's rendering of its properties looks correct visually
+
+The agent will use the `component_registry_get_usage` tool and then `component_registry_get_web_page_url` to get the page URL. If there is a web page in draft with the specified widget identifier, the returned URL will be a preview URL.
+
+The agent will then use the Chrome DevTools MCP server to navigate to the page and take a screenshot to evaluate the rendering of the widget on the website.
+
+You can see examples of these screenshots in the [validation-screenshots folder](/docs/validation-screenshots/), which was generated by an agent using this MCP server.

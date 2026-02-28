@@ -1,4 +1,5 @@
 using Kentico.Xperience.ComponentRegistry.MCP;
+using Kentico.Xperience.ComponentRegistry.MCP.Internal;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +8,18 @@ namespace Microsoft.Extensions.DependencyInjection;
 /// </summary>
 public static class ComponentRegistryMcpServiceCollectionExtensions
 {
+    /// <summary>
+    /// Registers Component Registry MCP support services in the DI container.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for method chaining.</returns>
+    public static IServiceCollection AddComponentRegistryMcpServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IAgentPageUrlGenerator, AgentPageUrlGenerator>();
+
+        return services;
+    }
+
     /// <summary>
     /// Adds Component Registry MCP tools to an existing MCP server builder.
     /// </summary>

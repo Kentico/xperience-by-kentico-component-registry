@@ -68,7 +68,7 @@ dotnet add package Kentico.Xperience.ComponentRegistry.MCP
 ## Quick Start
 
 1. Add the Admin and MCP NuGet packages to your Xperience by Kentico ASP.NET Core application.
-1. Register the integration's services, an MCP server and the integration's MCP tools:
+1. Register the integration's services, MCP support services, an MCP server and the integration's MCP tools:
 
    ```csharp
    // ...
@@ -76,6 +76,7 @@ dotnet add package Kentico.Xperience.ComponentRegistry.MCP
    if (env.IsDevelopment())
    {
       builder.Services
+        .AddComponentRegistryMcpServices() // Adds MCP support services for URL generation
         .AddMcpServer() // Host application is responsible for adding the McpServer
         .WithHttpTransport()
         .WithComponentRegistryTools(); // Adds this library's MCP tools
@@ -107,7 +108,7 @@ dotnet add package Kentico.Xperience.ComponentRegistry.MCP
        },
        "your-app": {
          "type": "http",
-         "url": "http://localhost:23146/mcp"
+         "url": "http://localhost:18319/mcp"
        }
      }
    }
