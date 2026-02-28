@@ -1,0 +1,66 @@
+{
+  "name": "xperience-community-component-registry-web-admin",
+  "version": "1.0.0",
+  "description": "Component registry admin UI client project.",
+  "private": true,
+  "scripts": {
+    "start": "npm run lint && webpack serve --mode development",
+    "build": "npm run lint && webpack --mode production",
+    "lint": "npx eslint src/**/*.tsx"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "dependencies": {
+    "@kentico/xperience-admin-base": "31.1.1",
+    "@kentico/xperience-admin-components": "31.1.1",
+    "@radix-ui/react-tabs": "1.1.13",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@babel/core": "7.29.0",
+    "@babel/plugin-transform-runtime": "7.29.0",
+    "@babel/preset-env": "7.29.0",
+    "@babel/preset-react": "7.28.5",
+    "@babel/preset-typescript": "7.28.5",
+    "@eslint/js": "9.39.2",
+    "@kentico/xperience-webpack-config": "31.1.1",
+    "@tailwindcss/postcss": "4.2.0",
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7",
+    "@typescript-eslint/eslint-plugin": "8.56.0",
+    "@typescript-eslint/utils": "8.56.0",
+    "babel-loader": "10.0.0",
+    "clsx": "2.1.1",
+    "css-loader": "7.1.4",
+    "eslint": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-n": "17.24.0",
+    "eslint-plugin-promise": "7.2.1",
+    "eslint-plugin-react": "7.37.5",
+    "globals": "17.3.0",
+    "lucide-react": "0.575.0",
+    "postcss": "8.5.6",
+    "postcss-loader": "8.2.1",
+    "prettier": "3.8.1",
+    "style-loader": "4.0.0",
+    "tailwind-merge": "3.5.0",
+    "tailwindcss": "4.2.0",
+    "tailwindcss-animate": "1.0.7",
+    "typescript": "5.9.3",
+    "webpack": "5.105.2",
+    "webpack-cli": "6.0.1",
+    "webpack-dev-server": "5.2.3"
+  },
+  "overrides": {
+    "react": "$react",
+    "react-dom": "$react",
+    "json-joy": ">= 11.19.0"
+  },
+  "browserslist": [
+    "> .2% and last 3 versions",
+    "not op_mini all",
+    "not IE 11"
+  ]
+}

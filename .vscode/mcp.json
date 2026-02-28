@@ -1,0 +1,23 @@
+{
+  "servers": {
+    "kentico-docs-mcp": {
+      "type": "http",
+      "url": "https://docs.kentico.com/mcp"
+    },
+    "DancingGoat": {
+      "type": "http",
+      "url": "http://localhost:18319/mcp"
+    },
+    "io.github.ChromeDevTools/chrome-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "chrome-devtools-mcp@0.17.1",
+        "--no-usage-statistics"
+      ]
+    }
+  },
+  "inputs": []
+}

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Product>Xperience Component Registry MCP Tools</Product>
+        <Title>$(Product)</Title>
+        <PackageId>Kentico.Xperience.ComponentRegistry.MCP</PackageId>
+        <Description>Adds MCP tools for Xperience Component Registry.</Description>
+        <RootNamespace>Kentico.Xperience.ComponentRegistry.MCP</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Kentico.Xperience.ComponentRegistry\Kentico.Xperience.ComponentRegistry.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ModelContextProtocol" />
+        <PackageReference Include="ModelContextProtocol.AspNetCore" />
+    </ItemGroup>
+
+</Project>

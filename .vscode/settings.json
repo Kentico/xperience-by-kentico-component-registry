@@ -31,13 +31,13 @@
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
 
-  "dotnet.defaultSolution": "Kentico.Xperience.RepoTemplate.slnx",
-
   "eslint.workingDirectories": [
     "./src/Kentico.Xperience.RepoTemplate.Admin/Client"
   ],
 
   "files.associations": {
     ".azuredevops/**/*.yml": "azure-pipelines"
-  }
+  },
+  "dotnet.defaultSolution": "Kentico.Xperience.ComponentRegistry.slnx",
+  "dotnet.solution.autoOpen": "Kentico.Xperience.ComponentRegistry.slnx"
 }

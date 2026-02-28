@@ -1,9 +1,5 @@
 # Contributing Setup
 
----This documents the steps a maintainer or developer would follow to work on the library in their development environment---
-
----Update the details for this project, replacing "repotemplate" and anything else that needs changed---
-
 ## Required Software
 
 The requirements to setup, develop, and build this project are listed below.
@@ -19,7 +15,7 @@ The requirements to setup, develop, and build this project are listed below.
 
 - [Node.js](https://nodejs.org/en/download) v24 or newer
 - [NVM for Windows](https://github.com/coreybutler/nvm-windows) to manage multiple installed versions of Node.js
-- See `engines` in the solution `package.json` for specific version requirements
+- See `engines` in `src/Kentico.Xperience.ComponentRegistry.Admin/Client/package.json` for specific version requirements
 
 ### C# Editor
 
@@ -35,7 +31,7 @@ SQL Server 2019 or newer compatible database
 
 ### SQL Editor
 
-- VS Code with official [MSSQL extension](https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql)
+- VS Code
 - MS SQL Server Management Studio
 
 ## Sample Project
@@ -49,14 +45,15 @@ documentation on [creating a new database](https://docs.xperience.io/xp26/develo
 
 ### Admin Customization
 
-To run the Sample app Admin customization in development mode, add the following to your [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-10.0&tabs=windows#secret-manager) for the application.
+To run the Sample app Admin customization in development mode, add the following to your [User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-7.0&tabs=windows#secret-manager) for the application.
 
 ```json
 "CMSAdminClientModuleSettings": {
-  "kentico-xperience-integrations-repotemplate": {
-    "Mode": "Proxy",
-    "Port": 3009
-  }
+   "xperience-community-component-registry-web-admin": {
+      "Mode": "Proxy",
+      "Port": 3019,
+      "UseSSL": true
+   }
 }
 ```
 
@@ -67,7 +64,7 @@ To run the Sample app Admin customization in development mode, add the following
    - `refactor/` - for restructuring of existing features
    - `fix/` - for bugfixes
 
-1. Run `dotnet format` against the `Kentico.Xperience.RepoTemplate` solution
+1. Run `dotnet format` against the `Kentico.Xperience.ComponentRegistry.slnx` solution
 
    > use `dotnet: format` VS Code task.
 
@@ -77,9 +74,3 @@ To run the Sample app Admin customization in development mode, add the following
    - The PR should have a helpful description of the scope of changes being contributed.
    - Include screenshots or video to reflect UX or UI updates
    - Indicate if new settings need to be applied when the changes are merged - locally or in other environments
-
-1. This repository is stored with `lf` line endings. If you are developing on Windows you can set your Git config to automatically checkout as `crlf` and commit as `lf`.
-
-   ```powershell
-   # git config --global core.autocrlf true
-   ```
