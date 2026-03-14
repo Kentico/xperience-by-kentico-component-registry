@@ -200,9 +200,6 @@ export const EmailBuilderComponentViewerTemplate = (
   const [sectionFilter, setSectionFilter] = useState('');
   const [templateFilter, setTemplateFilter] = useState('');
 
-  const totalComponents =
-    props.widgets.length + props.sections.length + props.emailTemplates.length;
-
   const filteredWidgets = props.widgets.filter((widget) =>
     widget.identifier.toLowerCase().includes(widgetFilter.trim().toLowerCase()),
   );
@@ -229,61 +226,6 @@ export const EmailBuilderComponentViewerTemplate = (
             Browse and explore all registered email builder components in the
             system
           </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Total Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {totalComponents}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Widgets
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {props.widgets.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Sections
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {props.sections.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Email Templates
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {props.emailTemplates.length}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Tabs */}

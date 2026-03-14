@@ -211,29 +211,29 @@ const FormComponentTableRow: React.FC<{
                   <h5 className="text-sm font-medium xp-text-muted mb-3">
                     Component Information
                   </h5>
-                  <dl className="space-y-2 text-sm">
-                    <div>
+                  <dl className="text-sm space-y-3">
+                    <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
                       <dt className="font-medium xp-text-muted">Identifier</dt>
-                      <dd className="xp-text-muted font-mono">
+                      <dd className="xp-text-muted font-mono break-all">
                         {component.identifier}
                       </dd>
                     </div>
-                    <div>
+                    <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
                       <dt className="font-medium xp-text-muted">Name</dt>
-                      <dd className="xp-text-muted">{component.name}</dd>
+                      <dd className="xp-text-muted break-words">{component.name}</dd>
                     </div>
                     {component.description && (
-                      <div>
+                      <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
                         <dt className="font-medium xp-text-muted">
                           Description
                         </dt>
-                        <dd className="xp-text-muted">
+                        <dd className="xp-text-muted break-words">
                           {component.description}
                         </dd>
                       </div>
                     )}
                     {component.markedTypeName && (
-                      <div>
+                      <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
                         <dt className="font-medium xp-text-muted">
                           Component Type
                         </dt>
@@ -347,9 +347,6 @@ export const FormBuilderComponentViewerTemplate = (
   const [componentFilter, setComponentFilter] = useState('');
   const [sectionFilter, setSectionFilter] = useState('');
 
-  const totalComponents =
-    props.formComponents.length + props.formSections.length;
-
   const filteredFormComponents = props.formComponents.filter((component) =>
     component.identifier
       .toLowerCase()
@@ -373,48 +370,6 @@ export const FormBuilderComponentViewerTemplate = (
             Browse and explore all registered form builder components in the
             system
           </p>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Total Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {totalComponents}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Form Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {props.formComponents.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-[#6f6f6f]">
-                Form Sections
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-[#151515]">
-                {props.formSections.length}
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Tabs */}
