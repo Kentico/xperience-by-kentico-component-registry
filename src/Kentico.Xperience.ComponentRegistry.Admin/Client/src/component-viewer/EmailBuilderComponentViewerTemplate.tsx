@@ -15,6 +15,8 @@ import {
   TableRow,
 } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Input } from './ui/input';
+import { Headline } from './ui/headline';
 import { ChevronDown, Loader } from 'lucide-react';
 import { usePageCommand } from '@kentico/xperience-admin-base';
 import { ComponentDetailsPanel } from './ComponentDetails';
@@ -94,14 +96,14 @@ const EmailComponentTableRow: React.FC<{
                 ? 'Permission required to view component usages'
                 : ''
             }
-            className="p-1 hover:bg-slate-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="xp-icon-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {!usageData && expanded ? (
-              <Loader size={16} className="animate-spin text-slate-600" />
+              <Loader size={16} className="animate-spin xp-icon-muted" />
             ) : (
               <ChevronDown
                 size={16}
-                className={`text-slate-600 transition-transform ${
+                className={`xp-icon-muted transition-transform ${
                   expanded ? '-rotate-180' : ''
                 }`}
               />
@@ -109,39 +111,39 @@ const EmailComponentTableRow: React.FC<{
           </button>
         </TableCell>
         <TableCell>
-          <code className="px-2 py-1 bg-slate-100 rounded text-xs font-mono text-slate-700">
+          <code className="xp-code-chip">
             {component.identifier}
           </code>
         </TableCell>
-        <TableCell className="font-semibold text-slate-900">
+        <TableCell className="font-semibold xp-text-default">
           {component.name}
         </TableCell>
-        <TableCell className="text-slate-600 max-w-md">
+        <TableCell className="xp-text-muted max-w-md">
           {component.description || (
-            <span className="text-slate-400 italic">No description</span>
+            <span className="xp-muted-dash italic">No description</span>
           )}
         </TableCell>
         <TableCell>
           {component.iconClass ? (
-            <code className="px-2 py-1 bg-blue-50 rounded text-xs font-mono text-blue-700">
+            <code className="xp-code-chip">
               {component.iconClass}
             </code>
           ) : (
-            <span className="text-slate-400">—</span>
+            <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
         <TableCell>
           {component.markedTypeName ? (
             <div
-              className="max-w-44 overflow-x-auto overflow-y-hidden"
+              className="max-w-xs overflow-x-auto overflow-y-hidden"
               title={component.markedTypeName}
             >
-              <code className="px-2 py-1 bg-purple-50 rounded text-xs font-mono text-purple-700 whitespace-nowrap">
+              <code className="xp-code-chip whitespace-nowrap">
                 {component.markedTypeName}
               </code>
             </div>
           ) : (
-            <span className="text-slate-400">—</span>
+            <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
         {isTemplate && (
@@ -151,14 +153,14 @@ const EmailComponentTableRow: React.FC<{
                 {component.contentTypeNames.map((ct: string) => (
                   <span
                     key={ct}
-                    className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-medium"
+                    className="xp-tag"
                   >
                     {ct}
                   </span>
                 ))}
               </div>
             ) : (
-              <span className="text-slate-400">—</span>
+              <span className="xp-muted-dash">—</span>
             )}
           </TableCell>
         )}
@@ -167,7 +169,7 @@ const EmailComponentTableRow: React.FC<{
       {expanded && (
         <TableRow>
           <TableCell colSpan={isTemplate ? 7 : 6} className="p-0">
-            <div className="p-4 bg-slate-50 border-t">
+            <div className="p-4 xp-panel-subtle border-t">
               {usageData ? (
                 <ComponentDetailsPanel
                   data={usageData}
@@ -175,11 +177,11 @@ const EmailComponentTableRow: React.FC<{
                 />
               ) : expanded && !usageData ? (
                 <div className="flex items-center justify-center p-8">
-                  <Loader className="animate-spin text-slate-600 mr-2" />
-                  <span className="text-slate-600">Loading usage data...</span>
+                  <Loader className="animate-spin xp-icon-muted mr-2" />
+                  <span className="xp-text-muted">Loading usage data...</span>
                 </div>
               ) : (
-                <div className="text-center p-8 text-slate-500">
+                <div className="text-center p-8 xp-empty-text">
                   <p>No usage data available</p>
                 </div>
               )}
@@ -198,9 +200,6 @@ export const EmailBuilderComponentViewerTemplate = (
   const [sectionFilter, setSectionFilter] = useState('');
   const [templateFilter, setTemplateFilter] = useState('');
 
-  const totalComponents =
-    props.widgets.length + props.sections.length + props.emailTemplates.length;
-
   const filteredWidgets = props.widgets.filter((widget) =>
     widget.identifier.toLowerCase().includes(widgetFilter.trim().toLowerCase()),
   );
@@ -216,104 +215,40 @@ export const EmailBuilderComponentViewerTemplate = (
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen p-8 overflow-x-hidden">
+      <div className="w-full max-w-[110rem] mx-auto space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight !text-slate-900">
+          <Headline size="L">
             Email Builder Components
-          </h1>
-          <p className="text-lg !text-slate-600">
+          </Headline>
+          <p className="text-lg xp-text-muted">
             Browse and explore all registered email builder components in the
             system
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-blue-700">
-                Total Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-blue-900">
-                {totalComponents}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-purple-700">
-                Widgets
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-purple-900">
-                {props.widgets.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-green-700">
-                Sections
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-green-900">
-                {props.sections.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-orange-700">
-                Email Templates
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-orange-900">
-                {props.emailTemplates.length}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Tabs */}
         <Tabs defaultValue="widgets" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger
-              value="widgets"
-              className="!text-slate-700 data-[state=active]:!text-slate-900"
-            >
+          <TabsList className="w-full max-w-md">
+            <TabsTrigger value="widgets">
               Widgets ({props.widgets.length})
             </TabsTrigger>
-            <TabsTrigger
-              value="sections"
-              className="!text-slate-700 data-[state=active]:!text-slate-900"
-            >
+            <TabsTrigger value="sections">
               Sections ({props.sections.length})
             </TabsTrigger>
-            <TabsTrigger
-              value="emailTemplates"
-              className="!text-slate-700 data-[state=active]:!text-slate-900"
-            >
+            <TabsTrigger value="emailTemplates">
               Templates ({props.emailTemplates.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="widgets" className="space-y-4">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
-                <CardTitle className="text-2xl !text-slate-900">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">
                   Email Widget Components
                 </CardTitle>
-                <CardDescription className="text-base !text-slate-600">
+                <CardDescription className="text-base">
                   Reusable widgets for email builder
                 </CardDescription>
               </CardHeader>
@@ -321,33 +256,32 @@ export const EmailBuilderComponentViewerTemplate = (
                 {props.widgets.length > 0 ? (
                   <>
                     <div className="mb-4">
-                      <input
+                      <Input
                         type="text"
                         placeholder="Filter by identifier..."
                         value={widgetFilter}
                         onChange={(e) => setWidgetFilter(e.target.value)}
-                        className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
                       />
                     </div>
                     {filteredWidgets.length > 0 ? (
-                      <div className="rounded-lg border">
+                      <div>
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-slate-50">
+                            <TableRow>
                               <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Name
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Description
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Icon
                               </TableHead>
-                              <TableHead className="w-44 font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Component Type
                               </TableHead>
                             </TableRow>
@@ -367,13 +301,13 @@ export const EmailBuilderComponentViewerTemplate = (
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500">
+                      <div className="text-center py-8 xp-empty-text">
                         <p>No components match this identifier filter</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 xp-empty-text">
                     <p className="text-lg">No email widgets registered</p>
                   </div>
                 )}
@@ -382,12 +316,12 @@ export const EmailBuilderComponentViewerTemplate = (
           </TabsContent>
 
           <TabsContent value="sections" className="space-y-4">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
-                <CardTitle className="text-2xl !text-slate-900">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">
                   Email Section Components
                 </CardTitle>
-                <CardDescription className="text-base !text-slate-600">
+                <CardDescription className="text-base">
                   Layout sections for structuring email content
                 </CardDescription>
               </CardHeader>
@@ -395,33 +329,32 @@ export const EmailBuilderComponentViewerTemplate = (
                 {props.sections.length > 0 ? (
                   <>
                     <div className="mb-4">
-                      <input
+                      <Input
                         type="text"
                         placeholder="Filter by identifier..."
                         value={sectionFilter}
                         onChange={(e) => setSectionFilter(e.target.value)}
-                        className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
                       />
                     </div>
                     {filteredSections.length > 0 ? (
-                      <div className="rounded-lg border">
+                      <div>
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-slate-50">
+                            <TableRow>
                               <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Name
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Description
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Icon
                               </TableHead>
-                              <TableHead className="w-44 font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Component Type
                               </TableHead>
                             </TableRow>
@@ -441,13 +374,13 @@ export const EmailBuilderComponentViewerTemplate = (
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500">
+                      <div className="text-center py-8 xp-empty-text">
                         <p>No components match this identifier filter</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 xp-empty-text">
                     <p className="text-lg">No email sections registered</p>
                   </div>
                 )}
@@ -456,12 +389,12 @@ export const EmailBuilderComponentViewerTemplate = (
           </TabsContent>
 
           <TabsContent value="emailTemplates" className="space-y-4">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-orange-50 to-amber-50">
-                <CardTitle className="text-2xl !text-slate-900">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">
                   Email Template Components
                 </CardTitle>
-                <CardDescription className="text-base !text-slate-600">
+                <CardDescription className="text-base">
                   Complete email templates for different content types
                 </CardDescription>
               </CardHeader>
@@ -469,36 +402,35 @@ export const EmailBuilderComponentViewerTemplate = (
                 {props.emailTemplates.length > 0 ? (
                   <>
                     <div className="mb-4">
-                      <input
+                      <Input
                         type="text"
                         placeholder="Filter by identifier..."
                         value={templateFilter}
                         onChange={(e) => setTemplateFilter(e.target.value)}
-                        className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
                       />
                     </div>
                     {filteredTemplates.length > 0 ? (
-                      <div className="rounded-lg border">
+                      <div>
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-slate-50">
+                            <TableRow>
                               <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Name
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Description
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Icon
                               </TableHead>
-                              <TableHead className="w-44 font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Component Type
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Content Types
                               </TableHead>
                             </TableRow>
@@ -518,13 +450,13 @@ export const EmailBuilderComponentViewerTemplate = (
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500">
+                      <div className="text-center py-8 xp-empty-text">
                         <p>No components match this identifier filter</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 xp-empty-text">
                     <p className="text-lg">No email templates registered</p>
                   </div>
                 )}

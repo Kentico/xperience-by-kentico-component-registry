@@ -47,6 +47,7 @@ public class ComponentRegistryReadService(
                 LocalizeOrNull(w.Description),
                 w.IconClass,
                 w.MarkedType?.FullName))
+            .OrderBy(w => w.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var sections = pageBuilderSectionStore.GetAll()
@@ -56,6 +57,7 @@ public class ComponentRegistryReadService(
                 LocalizeOrNull(s.Description),
                 s.IconClass,
                 s.MarkedType?.FullName))
+            .OrderBy(s => s.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var pageTemplates = pageBuilderPageTemplateStore.GetAll()
@@ -66,6 +68,7 @@ public class ComponentRegistryReadService(
                 pt.IconClass,
                 pt.MarkedType?.FullName,
                 pt.ContentTypeNames))
+            .OrderBy(pt => pt.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         return Task.FromResult(new PageBuilderRegistryReadModel(widgets, sections, pageTemplates));
@@ -84,6 +87,7 @@ public class ComponentRegistryReadService(
                 w.IconClass,
                 w.MarkedType?.FullName,
                 w.PropertiesType?.FullName))
+            .OrderBy(w => w.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var sections = emailBuilderSectionStore.GetAll()
@@ -94,6 +98,7 @@ public class ComponentRegistryReadService(
                 s.IconClass,
                 s.MarkedType?.FullName,
                 null))
+            .OrderBy(s => s.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var templates = emailBuilderTemplateStore.GetAll()
@@ -104,6 +109,7 @@ public class ComponentRegistryReadService(
                 t.IconClass,
                 t.MarkedType?.FullName,
                 t.ContentTypeNames))
+            .OrderBy(t => t.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         return Task.FromResult(new EmailBuilderRegistryReadModel(widgets, sections, templates));
@@ -121,6 +127,7 @@ public class ComponentRegistryReadService(
                 LocalizeOrNull(c.Description),
                 c.IconClass,
                 c.MarkedType?.FullName))
+            .OrderBy(c => c.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         var sections = formBuilderSectionStore.GetAll()
@@ -130,6 +137,7 @@ public class ComponentRegistryReadService(
                 LocalizeOrNull(s.Description),
                 s.IconClass,
                 s.MarkedType?.FullName))
+            .OrderBy(s => s.Identifier, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         return Task.FromResult(new FormBuilderRegistryReadModel(components, sections));

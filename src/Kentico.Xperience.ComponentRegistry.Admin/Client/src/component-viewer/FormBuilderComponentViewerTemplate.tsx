@@ -16,6 +16,9 @@ import {
   TableRow,
 } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Input } from './ui/input';
+import { Headline } from './ui/headline';
+import { Callout } from './ui/callout';
 import { ChevronDown, Link, Loader } from 'lucide-react';
 import {
   FormComponentDto,
@@ -144,14 +147,14 @@ const FormComponentTableRow: React.FC<{
                 ? 'Permission required to view component usages'
                 : ''
             }
-            className="p-1 hover:bg-slate-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="xp-icon-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
-              <Loader size={16} className="text-slate-600 animate-spin" />
+              <Loader size={16} className="xp-icon-muted animate-spin" />
             ) : (
               <ChevronDown
                 size={16}
-                className={`text-slate-600 transition-transform ${
+                className={`xp-icon-muted transition-transform ${
                   expanded ? '-rotate-180' : ''
                 }`}
               />
@@ -159,25 +162,25 @@ const FormComponentTableRow: React.FC<{
           </button>
         </TableCell>
         <TableCell>
-          <code className="px-2 py-1 bg-slate-100 rounded text-xs font-mono text-slate-700">
+          <code className="xp-code-chip">
             {component.identifier}
           </code>
         </TableCell>
-        <TableCell className="font-semibold text-slate-900">
+        <TableCell className="font-semibold xp-text-default">
           {component.name}
         </TableCell>
-        <TableCell className="text-slate-600 max-w-md">
+        <TableCell className="xp-text-muted max-w-md">
           {component.description || (
-            <span className="text-slate-400 italic">No description</span>
+            <span className="xp-muted-dash italic">No description</span>
           )}
         </TableCell>
         <TableCell>
           {component.iconClass ? (
-            <code className="px-2 py-1 bg-blue-50 rounded text-xs font-mono text-blue-700">
+            <code className="xp-code-chip">
               {component.iconClass}
             </code>
           ) : (
-            <span className="text-slate-400">—</span>
+            <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
         <TableCell>
@@ -186,12 +189,12 @@ const FormComponentTableRow: React.FC<{
               className="max-w-xs overflow-x-auto overflow-y-hidden"
               title={component.markedTypeName}
             >
-              <code className="px-2 py-1 bg-purple-50 rounded text-xs font-mono text-purple-700 whitespace-nowrap">
+              <code className="xp-code-chip whitespace-nowrap">
                 {component.markedTypeName}
               </code>
             </div>
           ) : (
-            <span className="text-slate-400">—</span>
+            <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
       </TableRow>
@@ -199,42 +202,42 @@ const FormComponentTableRow: React.FC<{
       {expanded && (
         <TableRow>
           <TableCell colSpan={6} className="p-0">
-            <div className="p-4 bg-slate-50 border-t">
-              <div className="bg-white p-4 rounded border border-slate-200">
-                <h4 className="font-semibold text-slate-900 mb-4">Details</h4>
+            <div className="p-4 xp-panel-subtle border-t">
+              <div className="bg-white p-4 rounded border border-[#dfdfdf]">
+                <h4 className="font-semibold xp-text-default mb-4">Details</h4>
 
                 {/* Component info section */}
                 <div className="mb-6 pb-6 border-b">
-                  <h5 className="text-sm font-medium text-slate-700 mb-3">
+                  <h5 className="text-sm font-medium xp-text-muted mb-3">
                     Component Information
                   </h5>
-                  <dl className="space-y-2 text-sm">
-                    <div>
-                      <dt className="font-medium text-slate-700">Identifier</dt>
-                      <dd className="text-slate-600 font-mono">
+                  <dl className="text-sm space-y-3">
+                    <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
+                      <dt className="font-medium xp-text-muted">Identifier</dt>
+                      <dd className="xp-text-muted font-mono break-all">
                         {component.identifier}
                       </dd>
                     </div>
-                    <div>
-                      <dt className="font-medium text-slate-700">Name</dt>
-                      <dd className="text-slate-600">{component.name}</dd>
+                    <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
+                      <dt className="font-medium xp-text-muted">Name</dt>
+                      <dd className="xp-text-muted break-words">{component.name}</dd>
                     </div>
                     {component.description && (
-                      <div>
-                        <dt className="font-medium text-slate-700">
+                      <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
+                        <dt className="font-medium xp-text-muted">
                           Description
                         </dt>
-                        <dd className="text-slate-600">
+                        <dd className="xp-text-muted break-words">
                           {component.description}
                         </dd>
                       </div>
                     )}
                     {component.markedTypeName && (
-                      <div>
-                        <dt className="font-medium text-slate-700">
+                      <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
+                        <dt className="font-medium xp-text-muted">
                           Component Type
                         </dt>
-                        <dd className="text-slate-600 font-mono text-xs break-all">
+                        <dd className="xp-text-muted font-mono text-xs break-all">
                           {component.markedTypeName}
                         </dd>
                       </div>
@@ -244,30 +247,30 @@ const FormComponentTableRow: React.FC<{
 
                 {/* Usage section */}
                 <div>
-                  <h5 className="text-sm font-medium text-slate-700 mb-4">
+                  <h5 className="text-sm font-medium xp-text-muted mb-4">
                     Component Usage
                   </h5>
                   {usageData ? (
                     <div className="space-y-6">
                       <div>
-                        <h6 className="text-sm font-medium text-slate-600 mb-3">
+                        <h6 className="text-sm font-medium xp-text-muted mb-3">
                           Form Builder
                         </h6>
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="bg-blue-50 p-3 rounded">
-                              <div className="text-xs text-blue-700 font-medium">
+                            <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
+                              <div className="text-xs xp-text-muted font-medium">
                                 Total Forms
                               </div>
-                              <div className="text-xl font-bold text-blue-900">
+                              <div className="text-xl font-bold xp-text-default">
                                 {combinedForms.length}
                               </div>
                             </div>
-                            <div className="bg-slate-100 p-3 rounded">
-                              <div className="text-xs text-slate-700 font-medium">
+                            <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
+                              <div className="text-xs xp-text-muted font-medium">
                                 Last Updated
                               </div>
-                              <div className="text-sm text-slate-600">
+                              <div className="text-sm xp-text-muted">
                                 {usageData.lastModified
                                   ? new Date(
                                       usageData.lastModified,
@@ -279,24 +282,24 @@ const FormComponentTableRow: React.FC<{
 
                           {combinedForms.length > 0 ? (
                             <div className="mt-4">
-                              <div className="text-xs font-medium text-slate-700 mb-2">
+                              <div className="text-xs font-medium xp-text-muted mb-2">
                                 Forms:
                               </div>
                               <div className="space-y-2 max-h-64 overflow-y-auto pr-3">
                                 {combinedForms.map((form) => (
                                   <div
                                     key={form.key}
-                                    className="p-3 bg-slate-50 rounded border border-slate-200 text-xs flex items-center justify-between gap-3"
+                                    className="p-3 bg-[#fbfbfb] rounded border border-[#dfdfdf] text-xs flex items-center justify-between gap-3"
                                   >
                                     <div className="min-w-0 flex-1">
-                                      <div className="font-medium text-slate-900 mb-1">
+                                      <div className="font-medium xp-text-default mb-1">
                                         {form.displayName}
                                       </div>
-                                      <div className="font-mono text-slate-600 text-xs">
+                                      <div className="font-mono xp-text-muted text-xs">
                                         {form.codeName}
                                       </div>
                                       {form.tableName && (
-                                        <div className="text-slate-500 text-xs mt-1">
+                                        <div className="xp-empty-text text-xs mt-1">
                                           Table: {form.tableName}
                                         </div>
                                       )}
@@ -306,7 +309,7 @@ const FormComponentTableRow: React.FC<{
                                         href={form.adminPath}
                                         title="Open form in Form Builder"
                                         aria-label="Open form in Form Builder"
-                                        className="text-blue-700 hover:text-blue-900 flex-shrink-0 mr-2"
+                                        className="text-[#3d5dff] hover:text-[#003ddc] flex-shrink-0 mr-2"
                                       >
                                         <Link size={20} />
                                       </a>
@@ -316,15 +319,15 @@ const FormComponentTableRow: React.FC<{
                               </div>
                             </div>
                           ) : (
-                            <div className="p-3 bg-yellow-50 rounded text-sm text-yellow-700">
+                            <Callout type="warning">
                               No forms use this item
-                            </div>
+                            </Callout>
                           )}
                         </div>
                       </div>
                     </div>
                   ) : (
-                    <div className="text-slate-500 italic">
+                    <div className="xp-empty-text italic">
                       Loading usage information...
                     </div>
                   )}
@@ -344,9 +347,6 @@ export const FormBuilderComponentViewerTemplate = (
   const [componentFilter, setComponentFilter] = useState('');
   const [sectionFilter, setSectionFilter] = useState('');
 
-  const totalComponents =
-    props.formComponents.length + props.formSections.length;
-
   const filteredFormComponents = props.formComponents.filter((component) =>
     component.identifier
       .toLowerCase()
@@ -359,85 +359,37 @@ export const FormBuilderComponentViewerTemplate = (
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen p-8">
+      <div className="w-full max-w-[110rem] mx-auto space-y-8">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-4xl font-bold tracking-tight !text-slate-900">
+          <Headline size="L">
             Form Builder Components
-          </h1>
-          <p className="text-lg !text-slate-600">
+          </Headline>
+          <p className="text-lg xp-text-muted">
             Browse and explore all registered form builder components in the
             system
           </p>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-blue-700">
-                Total Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-blue-900">
-                {totalComponents}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-purple-700">
-                Form Components
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-purple-900">
-                {props.formComponents.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium !text-green-700">
-                Form Sections
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold !text-green-900">
-                {props.formSections.length}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
         {/* Tabs */}
         <Tabs defaultValue="components" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger
-              value="components"
-              className="!text-slate-700 data-[state=active]:!text-slate-900"
-            >
+          <TabsList className="w-full max-w-md">
+            <TabsTrigger value="components">
               Components ({props.formComponents.length})
             </TabsTrigger>
-            <TabsTrigger
-              value="sections"
-              className="!text-slate-700 data-[state=active]:!text-slate-900"
-            >
+            <TabsTrigger value="sections">
               Sections ({props.formSections.length})
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="components" className="space-y-4">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-blue-50">
-                <CardTitle className="text-2xl !text-slate-900">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">
                   Form Component Types
                 </CardTitle>
-                <CardDescription className="text-base !text-slate-600">
+                <CardDescription className="text-base">
                   Reusable components for building forms
                 </CardDescription>
               </CardHeader>
@@ -445,33 +397,32 @@ export const FormBuilderComponentViewerTemplate = (
                 {props.formComponents.length > 0 ? (
                   <>
                     <div className="mb-4">
-                      <input
+                      <Input
                         type="text"
                         placeholder="Filter by identifier..."
                         value={componentFilter}
                         onChange={(e) => setComponentFilter(e.target.value)}
-                        className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
                       />
                     </div>
                     {filteredFormComponents.length > 0 ? (
-                      <div className="rounded-lg border">
+                      <div>
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-slate-50">
+                            <TableRow>
                               <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Name
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Description
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Icon
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Component Type
                               </TableHead>
                             </TableRow>
@@ -491,13 +442,13 @@ export const FormBuilderComponentViewerTemplate = (
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500">
+                      <div className="text-center py-8 xp-empty-text">
                         <p>No components match this identifier filter</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 xp-empty-text">
                     <p className="text-lg">No form components registered</p>
                   </div>
                 )}
@@ -506,12 +457,12 @@ export const FormBuilderComponentViewerTemplate = (
           </TabsContent>
 
           <TabsContent value="sections" className="space-y-4">
-            <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-green-50 to-teal-50">
-                <CardTitle className="text-2xl !text-slate-900">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">
                   Form Section Types
                 </CardTitle>
-                <CardDescription className="text-base !text-slate-600">
+                <CardDescription className="text-base">
                   Layout sections for organizing form components
                 </CardDescription>
               </CardHeader>
@@ -519,33 +470,32 @@ export const FormBuilderComponentViewerTemplate = (
                 {props.formSections.length > 0 ? (
                   <>
                     <div className="mb-4">
-                      <input
+                      <Input
                         type="text"
                         placeholder="Filter by identifier..."
                         value={sectionFilter}
                         onChange={(e) => setSectionFilter(e.target.value)}
-                        className="w-full px-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
                       />
                     </div>
                     {filteredFormSections.length > 0 ? (
-                      <div className="rounded-lg border">
+                      <div>
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-slate-50">
+                            <TableRow>
                               <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Name
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Description
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Icon
                               </TableHead>
-                              <TableHead className="font-semibold !text-slate-700">
+                              <TableHead className="font-semibold">
                                 Component Type
                               </TableHead>
                             </TableRow>
@@ -565,13 +515,13 @@ export const FormBuilderComponentViewerTemplate = (
                         </Table>
                       </div>
                     ) : (
-                      <div className="text-center py-8 text-slate-500">
+                      <div className="text-center py-8 xp-empty-text">
                         <p>No components match this identifier filter</p>
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 xp-empty-text">
                     <p className="text-lg">No form sections registered</p>
                   </div>
                 )}
