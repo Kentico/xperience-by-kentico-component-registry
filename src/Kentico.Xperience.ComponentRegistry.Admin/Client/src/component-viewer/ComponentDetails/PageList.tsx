@@ -2,6 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import { PageListItem } from './PageListItem';
 import { PageUsageDto } from './types';
+import { Input } from '../ui/input';
+import { Callout } from '../ui/callout';
 
 interface PageListProps {
   pages: PageUsageDto[];
@@ -29,11 +31,11 @@ export const PageList: React.FC<PageListProps> = ({
 
   if (pages.length === 0) {
     return (
-      <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <p className="text-sm text-slate-600">
+      <Callout type="info">
+        <p>
           No pages are using this component.
         </p>
-      </div>
+      </Callout>
     );
   }
 
@@ -43,14 +45,14 @@ export const PageList: React.FC<PageListProps> = ({
         <div className="relative">
           <Search
             size={16}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 xp-muted-dash"
           />
-          <input
+          <Input
             type="text"
             placeholder="Search pages by name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-sm text-slate-900 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-slate-500"
+            className="w-full pl-9 pr-3 text-sm"
           />
         </div>
       </div>
@@ -61,9 +63,9 @@ export const PageList: React.FC<PageListProps> = ({
       </h3>
       <div className="space-y-2">
         {filteredPages.length === 0 ? (
-          <p className="text-sm text-slate-600 p-4 bg-slate-50 rounded-lg border border-slate-200">
+          <Callout type="info">
             No pages match &quot;{searchTerm}&quot;.
-          </p>
+          </Callout>
         ) : (
           filteredPages.map((page) => (
             <PageListItem
