@@ -19,19 +19,19 @@ internal sealed class StubUsageService : IComponentUsageService
     public Task<ComponentUsageDetailDto> GetPageBuilderPageTemplateUsageAsync(string templateIdentifier)
     {
         LastCall = $"page-template:{templateIdentifier}";
-        return Task.FromResult(new ComponentUsageDetailDto { ComponentIdentifier = templateIdentifier, ComponentType = "PageTemplate" });
+        return Task.FromResult(CreatePageUsage(templateIdentifier, "PageTemplate"));
     }
 
     public Task<ComponentUsageDetailDto> GetPageBuilderWidgetUsageAsync(string widgetIdentifier)
     {
         LastCall = $"page-widget:{widgetIdentifier}";
-        return Task.FromResult(new ComponentUsageDetailDto { ComponentIdentifier = widgetIdentifier, ComponentType = "Widget" });
+        return Task.FromResult(CreatePageUsage(widgetIdentifier, "Widget"));
     }
 
     public Task<List<ComponentUsageDetailDto>> GetBatchUsageAsync(List<string> identifiers, string componentType)
     {
         LastCall = $"batch:{componentType}:{identifiers.Count}";
-        return Task.FromResult(identifiers.Select(i => new ComponentUsageDetailDto { ComponentIdentifier = i, ComponentType = componentType }).ToList());
+        return Task.FromResult(identifiers.Select(i => CreatePageUsage(i, componentType)).ToList());
     }
 
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderWidgetUsageAsync(string widgetIdentifier)
@@ -57,4 +57,37 @@ internal sealed class StubUsageService : IComponentUsageService
         LastCall = $"form-section:{sectionIdentifier}";
         return Task.FromResult(new FormComponentUsageDetailDto { ComponentIdentifier = sectionIdentifier, ComponentType = "Section" });
     }
+
+    private static ComponentUsageDetailDto CreatePageUsage(string identifier, string componentType) =>
+        new()
+        {
+            ComponentIdentifier = identifier,
+            ComponentType = componentType,
+            TotalPagesUsing = 1,
+            TotalVariants = 1,
+            Pages =
+            [
+                new PageUsageDto
+                {
+                    WebPageItemId = 42,
+                    ContentItemId = 84,
+                    PageName = "Test page",
+                    PagePath = "/test-page",
+                    WebsiteChannelID = 7,
+                    ChannelDisplayName = "Website",
+                    ContentTypeDisplayName = "Article",
+                    Variants =
+                    [
+                        new PageVariantDto
+                        {
+                            ContentItemCommonDataId = 21,
+                            LanguageName = "en-US",
+                            ConfigurationJson = "{}",
+                            ConfigurationType = componentType,
+                            IsPublished = true
+                        }
+                    ]
+                }
+            ]
+        };
 }

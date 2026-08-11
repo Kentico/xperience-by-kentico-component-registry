@@ -144,7 +144,7 @@ Gets detailed usage information for a specific component identifier across all p
 
 **Returns:** Varies by builder type:
 
-- **Page Builder**: `ComponentUsageDetailDto` - Contains `TotalPagesUsing`, `TotalVariants`, `LastModified`, and list of `Pages` with their `Variants`
+- **Page Builder**: `ComponentUsageMcpResponse` - Contains `TotalPagesUsing`, `TotalVariants`, `LastModified`, and list of `Pages` with their `Variants`
 - **Email Builder**: `EmailConfigurationUsageDetailDto` - Contains `TotalEmailConfigurationsUsing`, `TotalVariants`, and list of `EmailConfigurations` with their `Variants`
 - **Form Builder**: `FormComponentUsageDetailDto` - Contains `TotalFormClassesUsing`, `TotalFormBuilderFormsUsing`, and lists of `FormClasses` and `FormBuilderForms`
 
@@ -154,6 +154,10 @@ For Page and Email usage details, each variant includes:
 - `IsPublished`: Whether the variant is published
 - `LastModified`: Last modification date
 - `ConfigurationJson`: The component's JSON configuration
+
+For Page Builder usage details, each page also includes:
+
+- `ContentTypeDisplayName`: Display name of the page content type (for example, "Article")
 
 **Example use case:** Determine which pages use a specific widget and in which languages, including whether changes are published or in draft.
 
@@ -166,7 +170,7 @@ Gets page builder usage details for multiple widget or page template identifiers
 - `componentIdentifiers` (array of strings, required): List of component identifiers to query
 - `componentType` (string, required): Component type - `widget` or `page-template`
 
-**Returns:** `List<ComponentUsageDetailDto>` - Array of usage details, one per identifier
+**Returns:** `List<ComponentUsageMcpResponse>` - Array of usage details, one per identifier
 
 **Example use case:** Retrieve usage statistics for multiple widgets at once to build a dashboard or report showing which components are most frequently used.
 

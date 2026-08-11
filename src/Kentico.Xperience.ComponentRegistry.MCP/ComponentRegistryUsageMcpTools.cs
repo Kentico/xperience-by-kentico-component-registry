@@ -33,8 +33,8 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
 
         return (normalizedBuilder, normalizedType) switch
         {
-            ("page", "widget") => await componentUsageService.GetPageBuilderWidgetUsageAsync(componentIdentifier),
-            ("page", "page-template") => await componentUsageService.GetPageBuilderPageTemplateUsageAsync(componentIdentifier),
+            ("page", "widget") => ToMcpResponse(await componentUsageService.GetPageBuilderWidgetUsageAsync(componentIdentifier)),
+            ("page", "page-template") => ToMcpResponse(await componentUsageService.GetPageBuilderPageTemplateUsageAsync(componentIdentifier)),
             ("email", "widget") => await componentUsageService.GetEmailBuilderWidgetUsageAsync(componentIdentifier),
             ("email", "template") => await componentUsageService.GetEmailBuilderTemplateUsageAsync(componentIdentifier),
             ("form", "component") => await componentUsageService.GetFormBuilderComponentUsageAsync(componentIdentifier),
@@ -48,7 +48,7 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
     /// </summary>
     [McpServerTool(Name = "component_registry_get_page_batch_usage")]
     [Description("Get page builder batch usage. componentType: widget|page-template. identifiers: list of component IDs.")]
-    public async Task<List<ComponentUsageDetailDto>> GetPageBuilderBatchUsage(
+    public async Task<List<ComponentUsageMcpResponse>> GetPageBuilderBatchUsage(
         List<string> componentIdentifiers,
         string componentType,
         CancellationToken cancellationToken = default)
@@ -68,6 +68,38 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
             _ => throw new ArgumentException("componentType must be widget or page-template.", nameof(componentType))
         };
 
-        return await componentUsageService.GetBatchUsageAsync(componentIdentifiers, usageType);
+        var usageResults = await componentUsageService.GetBatchUsageAsync(componentIdentifiers, usageType);
+
+        return usageResults.Select(ToMcpResponse).ToList();
     }
+
+    private static ComponentUsageMcpResponse ToMcpResponse(ComponentUsageDetailDto usage) =>
+        new(
+            ComponentIdentifier: usage.ComponentIdentifier,
+            ComponentType: usage.ComponentType,
+            TotalPagesUsing: usage.TotalPagesUsing,
+            TotalVariants: usage.TotalVariants,
+            LastModified: usage.LastModified,
+            Pages: usage.Pages
+                .Select(page => new PageUsageMcpItem(
+                    WebPageItemId: page.WebPageItemId,
+                    ContentItemId: page.ContentItemId,
+                    PageName: page.PageName,
+                    PagePath: page.PagePath,
+                    WebsiteChannelID: page.WebsiteChannelID,
+                    ChannelDisplayName: page.ChannelDisplayName,
+                    ContentTypeDisplayName: page.ContentTypeDisplayName,
+                    CreatedAt: page.CreatedAt,
+                    ModifiedAt: page.ModifiedAt,
+                    Variants: page.Variants
+                        .Select(variant => new PageVariantMcpItem(
+                            ContentItemCommonDataId: variant.ContentItemCommonDataId,
+                            LanguageName: variant.LanguageName,
+                            LastModified: variant.LastModified,
+                            ConfigurationJson: variant.ConfigurationJson,
+                            ConfigurationType: variant.ConfigurationType,
+                            IsPublished: variant.IsPublished,
+                            AdminPath: variant.AdminPath))
+                        .ToList()))
+                .ToList());
 }

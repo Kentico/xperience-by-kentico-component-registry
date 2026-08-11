@@ -34,6 +34,44 @@ public record WebPageUrlResponse(
     bool Success,
     string? ErrorMessage);
 
+/// <summary>
+/// Page builder usage response payload for MCP tools.
+/// </summary>
+public record ComponentUsageMcpResponse(
+    string ComponentIdentifier,
+    string ComponentType,
+    int TotalPagesUsing,
+    int TotalVariants,
+    DateTime? LastModified,
+    IReadOnlyList<PageUsageMcpItem> Pages);
+
+/// <summary>
+/// A web page usage item in MCP page builder usage responses.
+/// </summary>
+public record PageUsageMcpItem(
+    int WebPageItemId,
+    int ContentItemId,
+    string PageName,
+    string PagePath,
+    int WebsiteChannelID,
+    string ChannelDisplayName,
+    string ContentTypeDisplayName,
+    DateTime CreatedAt,
+    DateTime? ModifiedAt,
+    IReadOnlyList<PageVariantMcpItem> Variants);
+
+/// <summary>
+/// A language variant item in MCP page builder usage responses.
+/// </summary>
+public record PageVariantMcpItem(
+    int ContentItemCommonDataId,
+    string LanguageName,
+    DateTime? LastModified,
+    string ConfigurationJson,
+    string ConfigurationType,
+    bool IsPublished,
+    string? AdminPath);
+
 internal static class ComponentRegistryMcpToolsValidation
 {
     public static void ValidateWebPageUrlRequest(int webPageItemId, string languageName)
