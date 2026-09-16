@@ -14,6 +14,7 @@ export interface PageUsageDto {
   pageName: string;
   pagePath: string;
   channelDisplayName: string;
+  contentTypeDisplayName: string;
   isPublished: boolean;
   createdAt: string;
   modifiedAt?: string;
