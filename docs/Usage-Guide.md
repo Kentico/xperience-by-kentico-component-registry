@@ -64,11 +64,11 @@ if (app.Environment.IsDevelopment())
 
 Configure your project's MCP servers using your AI development tool of choice.
 
-Example: VS Code and GitHub Copilot `.vscode/mcp.json`
+Example: GitHub Copilot CLI `.mcp.json` at the project root
 
 ```json
 {
-  "servers": {
+  "mcpServers": {
     "your-app": {
       "type": "http",
       "url": "http://localhost:18319/mcp"
@@ -76,6 +76,8 @@ Example: VS Code and GitHub Copilot `.vscode/mcp.json`
   }
 }
 ```
+
+For VS Code, use `.vscode/mcp.json` with `"servers"` instead of `"mcpServers"`.
 
 > [!WARNING]
 > The MCP server exposes component definitions and usage details (including page and content details) without any authentication. The MCP server feature is **intended for development-environments only**.

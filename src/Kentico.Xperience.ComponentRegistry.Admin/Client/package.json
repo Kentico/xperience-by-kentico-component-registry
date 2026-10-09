@@ -12,8 +12,8 @@
     "node": ">=24 <25"
   },
   "dependencies": {
-    "@kentico/xperience-admin-base": "31.1.1",
-    "@kentico/xperience-admin-components": "31.1.1",
+    "@kentico/xperience-admin-base": "31.9.2",
+    "@kentico/xperience-admin-components": "31.9.2",
     "@radix-ui/react-tabs": "1.1.13",
     "react": "18.3.1",
     "react-dom": "18.3.1"
@@ -25,7 +25,7 @@
     "@babel/preset-react": "7.28.5",
     "@babel/preset-typescript": "7.28.5",
     "@eslint/js": "9.39.2",
-    "@kentico/xperience-webpack-config": "31.1.1",
+    "@kentico/xperience-webpack-config": "31.9.2",
     "@tailwindcss/postcss": "4.2.0",
     "@types/react": "18.3.28",
     "@types/react-dom": "18.3.7",

@@ -38,10 +38,30 @@ SQL Server 2019 or newer compatible database
 
 ### Database Setup
 
-Running the sample project requires creating a new Xperience by Kentico database using the included template.
+The sample uses Xperience by Kentico `31.9.2`. Running it requires creating a new database using the included template; do not reuse the previous sample's database without upgrading it.
+
+The library's NuGet dependencies and administration client's `@kentico` packages also use `31.9.2`. Keep the client package manifest and lockfile aligned with the Xperience version in `Directory.Packages.props`.
 
 Change directory in your console to `./examples/DancingGoat` and follow the instructions in the Xperience
 documentation on [creating a new database](https://docs.kentico.com/documentation/developers-and-admins/installation#create-the-project-database).
+
+Run `dotnet tool restore` in the sample directory first to install its matching database manager. Store the connection string and hash salt in user secrets rather than tracked configuration files.
+
+### MCP Setup
+
+The repository root `.mcp.json` configures the documentation, Component Registry, Management API, and Chrome DevTools MCP servers. The sample runs at `http://localhost:18319`; its Component Registry endpoint is `/mcp`.
+
+The Management API is enabled only in development. Set a secret of at least 32 characters in the sample's user secrets and export the same value before starting Copilot:
+
+```powershell
+$env:MANAGEMENT_API_SECRET = [System.Convert]::ToHexString([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+dotnet user-secrets set "ManagementApi:Secret" $env:MANAGEMENT_API_SECRET --project .\examples\DancingGoat
+copilot
+```
+
+Run these commands from the repository root. Keep the secret outside source control and export the same value in later Copilot sessions. See [Configure the Management MCP](https://docs.kentico.com/documentation/developers-and-admins/api/management-api/configure-management-mcp-server).
+
+The sample inherits the library build settings through `examples/Directory.Build.props`, with upstream nullable settings and build analyzers disabled. `examples/.editorconfig` excludes sample C# files from `dotnet format` rewrites.
 
 ### Admin Customization
 

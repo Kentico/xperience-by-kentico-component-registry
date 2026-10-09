@@ -42,6 +42,7 @@ Interested in how and why this library was created? Read the blog post [Dream an
 
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
+| >= 31.9.2         | 1.0.1           |
 | >= 31.2.1         | 1.0.0           |
 
 ### Dependencies

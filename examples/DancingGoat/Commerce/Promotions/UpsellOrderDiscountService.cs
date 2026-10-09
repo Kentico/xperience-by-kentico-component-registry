@@ -1,13 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using CMS.Commerce;
-using CMS.DataEngine;
-using CMS.DataEngine.Query;
-using CMS.Helpers;
 
 using Kentico.Xperience.Admin.DigitalCommerce;
 
@@ -24,23 +21,17 @@ namespace DancingGoat.Commerce;
 /// </remarks>
 public class UpsellOrderDiscountService
 {
-    private readonly IServiceProvider serviceProvider;
-    private readonly IInfoProvider<PromotionInfo> promotionInfoProvider;
-    private readonly IInfoProvider<PromotionCouponInfo> promotionCouponInfoProvider;
+    private readonly PromotionRepository promotionRepository;
     private readonly IPriceFormatter priceFormatter;
     private readonly IStringLocalizer<DancingGoatShoppingCartController> localizer;
 
 
     public UpsellOrderDiscountService(
-        IServiceProvider serviceProvider,
-        IInfoProvider<PromotionInfo> promotionInfoProvider,
-        IInfoProvider<PromotionCouponInfo> promotionCouponInfoProvider,
+        PromotionRepository promotionRepository,
         IPriceFormatter priceFormatter,
         IStringLocalizer<DancingGoatShoppingCartController> localizer)
     {
-        this.serviceProvider = serviceProvider;
-        this.promotionInfoProvider = promotionInfoProvider;
-        this.promotionCouponInfoProvider = promotionCouponInfoProvider;
+        this.promotionRepository = promotionRepository;
         this.priceFormatter = priceFormatter;
         this.localizer = localizer;
     }
@@ -50,13 +41,16 @@ public class UpsellOrderDiscountService
     /// Gets an upsell message encouraging the customer to spend more to qualify for the next available order discount promotion.
     /// </summary>
     /// <param name="subtotalAfterLineDiscount">The current cart subtotal amount after line discounts (catalog discounts) were applied.</param>
+    /// <param name="currentlyAppliedOrderDiscountAmount">The amount of currently applied order-level discount.</param>
+    /// <param name="currentlyAppliedOrderPromotionId">Promotion ID of currently applied order promotion.</param>
+    /// <param name="appliedCouponCodes">List of coupon codes currently applied in the shopping cart.</param>
     /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
     /// <example>
     /// Example return value: "Spend $25.00 more and get 10% discount."
     /// </example>
-    public async Task<string> GetUpsellOrderDiscountMessage(decimal subtotalAfterLineDiscount, CancellationToken cancellationToken)
+    public async Task<string> GetUpsellOrderDiscountMessage(decimal subtotalAfterLineDiscount, decimal currentlyAppliedOrderDiscountAmount, int? currentlyAppliedOrderPromotionId, IEnumerable<string> appliedCouponCodes, CancellationToken cancellationToken)
     {
-        var (nextOrderDiscountRemainingTreshold, nextOrderDiscountValue) = await GetNextEligibleOrderPromotion(subtotalAfterLineDiscount, cancellationToken);
+        var (nextOrderDiscountRemainingTreshold, nextOrderDiscountValue) = await GetNextEligibleOrderPromotion(subtotalAfterLineDiscount, currentlyAppliedOrderDiscountAmount, currentlyAppliedOrderPromotionId, appliedCouponCodes, cancellationToken);
 
         if ((nextOrderDiscountRemainingTreshold > 0) && !string.IsNullOrEmpty(nextOrderDiscountValue))
         {
@@ -73,6 +67,9 @@ public class UpsellOrderDiscountService
     /// Gets the next eligible order promotion that the customer can qualify for by spending more.
     /// </summary>
     /// <param name="subtotalAfterLineDiscount">The current cart subtotal amount after line discounts (catalog discounts) were applied.</param>
+    /// <param name="currentlyAppliedOrderDiscountAmount">The amount of currently applied order-level discount.</param>
+    /// <param name="currentlyAppliedOrderPromotionId">Promotion ID of currently applied order promotion.</param>
+    /// <param name="appliedCouponCodes">List of coupon codes currently applied in the shopping cart.</param>
     /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
     /// <returns>
     /// A tuple containing:
@@ -80,14 +77,18 @@ public class UpsellOrderDiscountService
     /// - Item2: A formatted label representing the discount value (e.g., "10%" or "$25.00").
     /// Returns default tuple (0, null) if no eligible promotion is found.
     /// </returns>
-    private async Task<(decimal, string)> GetNextEligibleOrderPromotion(decimal subtotalAfterLineDiscount, CancellationToken cancellationToken)
+    private async Task<(decimal, string)> GetNextEligibleOrderPromotion(decimal subtotalAfterLineDiscount, decimal currentlyAppliedOrderDiscountAmount, int? currentlyAppliedOrderPromotionId, IEnumerable<string> appliedCouponCodes, CancellationToken cancellationToken)
     {
-        var activeOrderPromotions = await GetActiveOrderPromotions(cancellationToken);
-        var promotionRuleProperties = ExtractPromotionRuleProperties(activeOrderPromotions);
+        var activeOrderPromotions = (await promotionRepository.GetActivePromotions(PromotionType.Order, appliedCouponCodes, cancellationToken))
+            .Where(promotion => string.Equals(promotion.PromotionRuleIdentifier, DancingGoatOrderPromotionRule.IDENTIFIER, StringComparison.InvariantCultureIgnoreCase));
+        var promotionRulePropertiesById = ExtractPromotionRulePropertiesByPromotionId(activeOrderPromotions);
+        promotionRulePropertiesById.TryGetValue(currentlyAppliedOrderPromotionId ?? 0, out var currentlyAppliedPromotionRuleProperties);
 
-        var fixedValuesBasedPromotionProperties = promotionRuleProperties
-                                                        .Where(p => p.MinimumRequirementValueType == MinimumRequirementValueType.Price)
-                                                        .OrderBy(p => p.MinimumRequirementValue);
+        var fixedValuesBasedPromotionProperties = promotionRulePropertiesById
+                                                        .Where(p => p.Value.MinimumRequirementValueType == MinimumRequirementValueType.Price)
+                                                        .Where(p => IsBetterThanCurrentPromotion(p.Value, currentlyAppliedOrderDiscountAmount, currentlyAppliedPromotionRuleProperties))
+                                                        .OrderBy(p => p.Value.MinimumRequirementValue)
+                                                        .Select(p => p.Value);
 
         var nextAvailablePromotion = fixedValuesBasedPromotionProperties.FirstOrDefault(p => p.MinimumRequirementValue > subtotalAfterLineDiscount);
 
@@ -100,6 +101,36 @@ public class UpsellOrderDiscountService
         var amountToSpend = nextAvailablePromotion.MinimumRequirementValue - subtotalAfterLineDiscount;
 
         return (amountToSpend, label);
+    }
+
+
+    private static decimal GetDiscountAmountForAmount(OrderPromotionRuleProperties promotionRuleProperties, decimal amount)
+    {
+        if (promotionRuleProperties.DiscountValueType == DiscountValueType.Percentage)
+        {
+            return amount * promotionRuleProperties.DiscountValue / 100;
+        }
+
+        return promotionRuleProperties.DiscountValue;
+    }
+
+
+    private static bool IsBetterThanCurrentPromotion(
+        OrderPromotionRuleProperties candidatePromotionRuleProperties,
+        decimal currentlyAppliedOrderDiscountAmount,
+        OrderPromotionRuleProperties currentlyAppliedPromotionRuleProperties)
+    {
+        // Compare both promotions on the same amount to avoid false upsell for "lower percentage at higher threshold" cases.
+        if (currentlyAppliedPromotionRuleProperties != null)
+        {
+            var comparisonAmount = candidatePromotionRuleProperties.MinimumRequirementValue;
+            var currentDiscountOnComparisonAmount = GetDiscountAmountForAmount(currentlyAppliedPromotionRuleProperties, comparisonAmount);
+            var candidateDiscountOnComparisonAmount = GetDiscountAmountForAmount(candidatePromotionRuleProperties, comparisonAmount);
+
+            return candidateDiscountOnComparisonAmount > currentDiscountOnComparisonAmount;
+        }
+
+        return GetDiscountAmountForAmount(candidatePromotionRuleProperties, candidatePromotionRuleProperties.MinimumRequirementValue) > currentlyAppliedOrderDiscountAmount;
     }
 
 
@@ -124,54 +155,19 @@ public class UpsellOrderDiscountService
     /// <returns>
     /// A collection of <see cref="OrderPromotionRuleProperties"/> extracted from the promotion configurations.
     /// </returns>
-    private static IEnumerable<OrderPromotionRuleProperties> ExtractPromotionRuleProperties(IEnumerable<PromotionInfo> promotions)
+    private static Dictionary<int, OrderPromotionRuleProperties> ExtractPromotionRulePropertiesByPromotionId(IEnumerable<PromotionInfo> promotions)
     {
-        var promotionProperties = new List<OrderPromotionRuleProperties>();
+        var promotionPropertiesById = new Dictionary<int, OrderPromotionRuleProperties>();
         foreach (var promotion in promotions)
         {
             var promotionRuleProperties = promotion.GetPromotionRuleProperties<OrderPromotionRuleProperties>();
 
             if (promotionRuleProperties != null)
             {
-                promotionProperties.Add(promotionRuleProperties);
+                promotionPropertiesById[promotion.PromotionID] = promotionRuleProperties;
             }
         }
 
-        return promotionProperties;
-    }
-
-
-    /// <summary>
-    /// Retrieves all active order promotions that match the DancingGoat order promotion rule identifier.
-    /// </summary>
-    /// <param name="cancellationToken">Cancellation token to cancel the operation.</param>
-    /// <returns>
-    /// A collection of <see cref="PromotionInfo"/> objects representing active order promotions.
-    /// Only promotions that are currently active (within their active date range) and don't have a coupon defined are returned.
-    /// </returns>
-    private async Task<IEnumerable<PromotionInfo>> GetActiveOrderPromotions(CancellationToken cancellationToken)
-    {
-        DateTime currentTime = DateTime.Now;
-
-        var couponSubquery = promotionCouponInfoProvider.Get()
-            .Column(nameof(PromotionCouponInfo.PromotionCouponID))
-            .WhereEquals(nameof(PromotionCouponInfo.PromotionCouponPromotionID), nameof(PromotionInfo.PromotionID).AsColumn());
-
-        return await promotionInfoProvider.Get()
-            // Order promotions only
-            .WhereEquals(nameof(PromotionInfo.PromotionType), PromotionType.Order.ToStringRepresentation())
-            // Only the specified promotion rule
-            .WhereEquals(nameof(PromotionInfo.PromotionRuleIdentifier), DancingGoatOrderPromotionRule.IDENTIFIER)
-            // Active promotions
-            .WhereNotNull(nameof(PromotionInfo.PromotionActiveFromWhen))
-            .WhereLessThan(nameof(PromotionInfo.PromotionActiveFromWhen), currentTime)
-            .Where(new WhereCondition()
-                .WhereNull(nameof(PromotionInfo.PromotionActiveToWhen))
-                .Or()
-                .WhereGreaterThan(nameof(PromotionInfo.PromotionActiveToWhen), currentTime)
-            )
-            // Only promotions without coupons
-            .WhereNotExists(couponSubquery)
-            .GetEnumerableTypedResultAsync(cancellationToken: cancellationToken);
+        return promotionPropertiesById;
     }
 }
