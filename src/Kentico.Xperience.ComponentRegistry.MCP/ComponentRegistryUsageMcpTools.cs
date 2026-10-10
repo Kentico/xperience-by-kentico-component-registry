@@ -34,8 +34,10 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
         return (normalizedBuilder, normalizedType) switch
         {
             ("page", "widget") => await componentUsageService.GetPageBuilderWidgetUsageAsync(componentIdentifier),
+            ("page", "section") => await componentUsageService.GetPageBuilderSectionUsageAsync(componentIdentifier),
             ("page", "page-template") => await componentUsageService.GetPageBuilderPageTemplateUsageAsync(componentIdentifier),
             ("email", "widget") => await componentUsageService.GetEmailBuilderWidgetUsageAsync(componentIdentifier),
+            ("email", "section") => await componentUsageService.GetEmailBuilderSectionUsageAsync(componentIdentifier),
             ("email", "template") => await componentUsageService.GetEmailBuilderTemplateUsageAsync(componentIdentifier),
             ("form", "component") => await componentUsageService.GetFormBuilderComponentUsageAsync(componentIdentifier),
             ("form", "section") => await componentUsageService.GetFormBuilderSectionUsageAsync(componentIdentifier),

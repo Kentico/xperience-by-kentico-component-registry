@@ -27,6 +27,13 @@ public interface IComponentUsageService
     public Task<ComponentUsageDetailDto> GetPageBuilderWidgetUsageAsync(string widgetIdentifier);
 
     /// <summary>
+    /// Gets detailed usage information for a specific page builder section.
+    /// </summary>
+    /// <param name="sectionIdentifier">The unique identifier of the section.</param>
+    /// <returns>Component usage details including all pages and language variants.</returns>
+    public Task<ComponentUsageDetailDto> GetPageBuilderSectionUsageAsync(string sectionIdentifier);
+
+    /// <summary>
     /// Gets usage information for multiple components in a batch operation.
     /// </summary>
     /// <param name="identifiers">List of component identifiers to query.</param>
@@ -40,6 +47,13 @@ public interface IComponentUsageService
     /// <param name="widgetIdentifier">The unique identifier of the email widget.</param>
     /// <returns>Email configuration usage details including all email configurations and language variants.</returns>
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderWidgetUsageAsync(string widgetIdentifier);
+
+    /// <summary>
+    /// Gets detailed usage information for a specific email builder section.
+    /// </summary>
+    /// <param name="sectionIdentifier">The unique identifier of the section.</param>
+    /// <returns>Email configuration usage details including all configurations and language variants.</returns>
+    public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderSectionUsageAsync(string sectionIdentifier);
 
     /// <summary>
     /// Gets detailed usage information for a specific email builder template.
@@ -85,6 +99,12 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
             "ContentItemCommonDataVisualBuilderWidgets");
 
     /// <inheritdoc/>
+    public Task<ComponentUsageDetailDto> GetPageBuilderSectionUsageAsync(string sectionIdentifier) => GetComponentUsage(
+            sectionIdentifier,
+            "Section",
+            "ContentItemCommonDataVisualBuilderWidgets");
+
+    /// <inheritdoc/>
     public async Task<List<ComponentUsageDetailDto>> GetBatchUsageAsync(
         List<string> identifiers,
         string componentType)
@@ -107,6 +127,12 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderWidgetUsageAsync(string widgetIdentifier) => GetEmailComponentUsage(
             widgetIdentifier,
             "EmailWidget",
+            "ContentItemCommonDataVisualBuilderWidgets");
+
+    /// <inheritdoc/>
+    public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderSectionUsageAsync(string sectionIdentifier) => GetEmailComponentUsage(
+            sectionIdentifier,
+            "EmailSection",
             "ContentItemCommonDataVisualBuilderWidgets");
 
     /// <inheritdoc/>

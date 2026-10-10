@@ -3,14 +3,21 @@ namespace Kentico.Xperience.ComponentRegistry.Tests;
 public class ComponentRegistryUsageMcpToolsTests
 {
     [Test]
-    public async Task GetComponentUsage_RoutesToExpectedUsageMethod()
+    [TestCase("page", "section", "page.section", "page-section:page.section")]
+    [TestCase("email", "section", "email.section", "email-section:email.section")]
+    [TestCase("form", "section", "form.section", "form-section:form.section")]
+    public async Task GetComponentUsage_RoutesSectionQueriesToExpectedUsageMethod(
+        string builder,
+        string sectionType,
+        string identifier,
+        string expectedCall)
     {
         var usage = new StubUsageService();
         var tools = new ComponentRegistryUsageMcpTools(usage);
 
-        _ = await tools.GetComponentUsage("form", "section", "form.section");
+        _ = await tools.GetComponentUsage(builder, sectionType, identifier);
 
-        Assert.That(usage.LastCall, Is.EqualTo("form-section:form.section"));
+        Assert.That(usage.LastCall, Is.EqualTo(expectedCall));
     }
 
     [Test]

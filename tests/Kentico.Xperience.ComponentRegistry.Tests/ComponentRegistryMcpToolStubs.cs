@@ -28,6 +28,12 @@ internal sealed class StubUsageService : IComponentUsageService
         return Task.FromResult(new ComponentUsageDetailDto { ComponentIdentifier = widgetIdentifier, ComponentType = "Widget" });
     }
 
+    public Task<ComponentUsageDetailDto> GetPageBuilderSectionUsageAsync(string sectionIdentifier)
+    {
+        LastCall = $"page-section:{sectionIdentifier}";
+        return Task.FromResult(new ComponentUsageDetailDto { ComponentIdentifier = sectionIdentifier, ComponentType = "Section" });
+    }
+
     public Task<List<ComponentUsageDetailDto>> GetBatchUsageAsync(List<string> identifiers, string componentType)
     {
         LastCall = $"batch:{componentType}:{identifiers.Count}";
@@ -38,6 +44,12 @@ internal sealed class StubUsageService : IComponentUsageService
     {
         LastCall = $"email-widget:{widgetIdentifier}";
         return Task.FromResult(new EmailConfigurationUsageDetailDto { ComponentIdentifier = widgetIdentifier, ComponentType = "EmailWidget" });
+    }
+
+    public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderSectionUsageAsync(string sectionIdentifier)
+    {
+        LastCall = $"email-section:{sectionIdentifier}";
+        return Task.FromResult(new EmailConfigurationUsageDetailDto { ComponentIdentifier = sectionIdentifier, ComponentType = "EmailSection" });
     }
 
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderTemplateUsageAsync(string templateIdentifier)
