@@ -16,7 +16,6 @@ import {
 } from './ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Input } from './ui/input';
-import { Headline } from './ui/headline';
 import { ChevronDown, Loader } from 'lucide-react';
 import { usePageCommand } from '@kentico/xperience-admin-base';
 import { ComponentDetailsPanel } from './ComponentDetails';
@@ -217,17 +216,7 @@ export const PageBuilderComponentViewerTemplate = (
 
   return (
     <div className="min-h-screen p-8">
-      <div className="w-full max-w-[110rem] mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <Headline size="L">
-            Component Registry
-          </Headline>
-          <p className="text-lg xp-text-muted">
-            Browse and explore all registered components in the system
-          </p>
-        </div>
-
+      <div className="w-full max-w-[110rem] mx-auto">
         {/* Tabs */}
         <Tabs defaultValue="widgets" className="w-full">
           <TabsList className="w-full max-w-md">

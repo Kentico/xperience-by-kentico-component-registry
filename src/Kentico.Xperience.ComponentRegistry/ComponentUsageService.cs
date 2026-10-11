@@ -174,7 +174,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     WPI.WebPageItemTreePath,
                     WPI.WebPageItemWebsiteChannelID,
                     C.ChannelDisplayName,
-                    CT.ContentTypeDisplayName,
+                    CT.ClassDisplayName AS ContentTypeDisplayName,
                     CI.ContentItemID,
                     CL.ContentLanguageID,
                     CL.ContentLanguageName,
@@ -184,7 +184,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     CICD.[{configColumnName}]
                 FROM CMS_WebPageItem WPI
                 INNER JOIN CMS_ContentItem CI ON WPI.WebPageItemContentItemID = CI.ContentItemID
-                LEFT JOIN CMS_ContentType CT ON CI.ContentItemContentTypeID = CT.ContentTypeID
+                LEFT JOIN CMS_Class CT ON CI.ContentItemContentTypeID = CT.ClassID
                 INNER JOIN CMS_ContentItemCommonData CICD ON CI.ContentItemID = CICD.ContentItemCommonDataContentItemID
                 INNER JOIN CMS_ContentLanguage CL ON CICD.ContentItemCommonDataContentLanguageID = CL.ContentLanguageID
                 INNER JOIN CMS_Channel C ON CI.ContentItemChannelID = C.ChannelID
@@ -310,6 +310,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     EC.EmailConfigurationName,
                     EC.EmailConfigurationPurpose,
                     C.ChannelDisplayName,
+                    CT.ClassDisplayName AS ContentTypeDisplayName,
                     CI.ContentItemID,
                     CL.ContentLanguageID,
                     CL.ContentLanguageName,
@@ -319,6 +320,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     CICD.[{configColumnName}]
                 FROM EmailLibrary_EmailConfiguration EC
                 INNER JOIN CMS_ContentItem CI ON EC.EmailConfigurationContentItemID = CI.ContentItemID
+                LEFT JOIN CMS_Class CT ON CI.ContentItemContentTypeID = CT.ClassID
                 INNER JOIN CMS_ContentItemCommonData CICD ON CI.ContentItemID = CICD.ContentItemCommonDataContentItemID
                 INNER JOIN CMS_ContentLanguage CL ON CICD.ContentItemCommonDataContentLanguageID = CL.ContentLanguageID
                 INNER JOIN CMS_Channel C ON CI.ContentItemChannelID = C.ChannelID
@@ -351,6 +353,10 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     string configurationPurpose = reader.GetString(reader.GetOrdinal("EmailConfigurationPurpose"));
                     int emailChannelID = reader.GetInt32(reader.GetOrdinal("EmailConfigurationEmailChannelID"));
                     string channelDisplayName = reader.GetString(reader.GetOrdinal("ChannelDisplayName"));
+                    int contentTypeOrdinal = reader.GetOrdinal("ContentTypeDisplayName");
+                    string contentTypeDisplayName = !await reader.IsDBNullAsync(contentTypeOrdinal, cancellationToken)
+                        ? reader.GetString(contentTypeOrdinal)
+                        : string.Empty;
                     int contentItemId = reader.GetInt32(reader.GetOrdinal("ContentItemID"));
                     string languageName = reader.GetString(reader.GetOrdinal("ContentLanguageName"));
                     int commonDataId = reader.GetInt32(reader.GetOrdinal("ContentItemCommonDataID"));
@@ -382,6 +388,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                             ConfigurationPurpose = configurationPurpose,
                             EmailChannelID = emailChannelID,
                             ChannelDisplayName = channelDisplayName,
+                            ContentTypeDisplayName = contentTypeDisplayName,
                             CreatedAt = DateTime.UtcNow,
                             Variants = []
                         };
@@ -899,6 +906,11 @@ public class EmailConfigurationUsageDto
     /// The display name of the channel this email configuration belongs to.
     /// </summary>
     public string ChannelDisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The display name of the content type this email configuration belongs to.
+    /// </summary>
+    public string ContentTypeDisplayName { get; set; } = string.Empty;
 
     /// <summary>
     /// The date when the email configuration was created.

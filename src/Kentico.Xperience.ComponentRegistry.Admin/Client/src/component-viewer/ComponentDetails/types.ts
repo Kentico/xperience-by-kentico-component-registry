@@ -80,6 +80,7 @@ export interface EmailConfigurationUsageDto {
   configurationName: string;
   configurationPurpose: string;
   channelDisplayName: string;
+  contentTypeDisplayName: string;
   createdAt: string;
   modifiedAt?: string;
   variants: EmailConfigurationVariantDto[];

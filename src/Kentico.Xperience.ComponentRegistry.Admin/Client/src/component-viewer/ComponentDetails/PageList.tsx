@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import { PageListItem } from './PageListItem';
 import { PageUsageDto } from './types';
 import { Input } from '../ui/input';
@@ -68,20 +68,24 @@ export const PageList: React.FC<PageListProps> = ({
               className="w-full pl-9 pr-3 text-sm"
             />
           </div>
-          <div className="xp-input-wrapper min-w-48 sm:w-64">
+          <div className="xp-input-wrapper relative min-w-48 sm:w-64">
             <select
               value={selectedContentType}
               onChange={(e) => setSelectedContentType(e.target.value)}
-              className="xp-input text-sm"
+              className="xp-input appearance-none pr-10 text-sm"
               aria-label="Filter by content type"
             >
-              <option value="">(select)</option>
+              <option value="">All content types</option>
               {contentTypeOptions.map((contentType) => (
                 <option key={contentType} value={contentType}>
                   {contentType}
                 </option>
               ))}
             </select>
+            <ChevronDown
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 xp-icon-muted"
+            />
           </div>
         </div>
       </div>
