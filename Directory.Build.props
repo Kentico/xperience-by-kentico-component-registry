@@ -29,7 +29,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
     <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+    <!-- KXCR0001, S1133: deprecation of old package IDs. Remove when packages are renamed. -->
+    <NoWarn>$(NoWarn);1591;KXCR0001;S1133</NoWarn>
     <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
     <RootNamespace>Kentico.Xperience.ComponentRegistry</RootNamespace>
 

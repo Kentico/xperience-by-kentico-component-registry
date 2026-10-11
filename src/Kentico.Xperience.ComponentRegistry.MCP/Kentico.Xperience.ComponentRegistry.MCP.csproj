@@ -4,7 +4,7 @@
         <Product>Xperience Component Registry MCP Tools</Product>
         <Title>$(Product)</Title>
         <PackageId>Kentico.Xperience.ComponentRegistry.MCP</PackageId>
-        <Description>Adds MCP tools for Xperience Component Registry.</Description>
+        <Description>DEPRECATED: replaced by Kentico.Xperience.Labs.ComponentRegistry.MCP. Adds MCP tools for Xperience Component Registry.</Description>
         <RootNamespace>Kentico.Xperience.ComponentRegistry.MCP</RootNamespace>
     </PropertyGroup>
 

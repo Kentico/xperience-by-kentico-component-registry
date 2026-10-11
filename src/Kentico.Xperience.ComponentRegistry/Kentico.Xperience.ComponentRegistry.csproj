@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Product>Xperience Component Registry services</Product>
     <Title>$(Product)</Title>
-    <Description>Adds services for Xperience Component Registry.</Description>
+    <Description>DEPRECATED: replaced by Kentico.Xperience.Labs.ComponentRegistry. Adds services for Xperience Component Registry.</Description>
   </PropertyGroup>
 
   <ItemGroup>

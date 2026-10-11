@@ -13,6 +13,7 @@ public static class ComponentRegistryMcpServiceCollectionExtensions
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <returns>The service collection for method chaining.</returns>
+    [Obsolete(DeprecationMessages.PackageRenamed, DiagnosticId = DeprecationMessages.DiagnosticId, UrlFormat = DeprecationMessages.Url)]
     public static IServiceCollection AddComponentRegistryMcpServices(this IServiceCollection services)
     {
         services.AddSingleton<IAgentPageUrlGenerator, AgentPageUrlGenerator>();
@@ -29,6 +30,7 @@ public static class ComponentRegistryMcpServiceCollectionExtensions
     /// </remarks>
     /// <param name="builder">The MCP server builder.</param>
     /// <returns>The MCP server builder for method chaining.</returns>
+    [Obsolete(DeprecationMessages.PackageRenamed, DiagnosticId = DeprecationMessages.DiagnosticId, UrlFormat = DeprecationMessages.Url)]
     public static IMcpServerBuilder WithComponentRegistryTools(this IMcpServerBuilder builder) =>
         builder.WithToolsFromAssembly(typeof(ComponentRegistryDefinitionMcpTools).Assembly);
 }

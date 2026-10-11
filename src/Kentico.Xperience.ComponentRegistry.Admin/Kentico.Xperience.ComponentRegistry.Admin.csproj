@@ -3,7 +3,7 @@
     <AdminOrgName>kentico</AdminOrgName>
     <Product>Xperience Component Registry Administration module</Product>
     <Title>$(Product)</Title>
-    <Description>Adds Administration Module for Xperience Component Registry Module.</Description>
+    <Description>DEPRECATED: replaced by Kentico.Xperience.Labs.ComponentRegistry.Admin. Adds Administration Module for Xperience Component Registry Module.</Description>
   </PropertyGroup>
 
   <ItemGroup>
