@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm run lint && webpack serve --mode development",
     "build": "npm run lint && webpack --mode production",
-    "lint": "npx eslint src/**/*.tsx"
+    "lint": "npx eslint src/**/*.tsx",
+    "typecheck": "tsc --noEmit"
   },
   "engines": {
     "node": ">=24 <25"

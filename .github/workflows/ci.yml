@@ -44,16 +44,28 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: src/Kentico.Xperience.ComponentRegistry.Admin/Client/package-lock.json
+
       - name: Install dependencies
         run: |
           dotnet restore `
             --locked-mode
 
+      # Release build runs npm ci and npm run build (lint + webpack) for the Admin client
       - name: Build Solution
         run: |
           dotnet build `
             --configuration Release `
             --no-restore
+
+      - name: Type-check Admin client
+        working-directory: src/Kentico.Xperience.ComponentRegistry.Admin/Client
+        run: npm run typecheck
 
       - name: Test Solution
         run: |
