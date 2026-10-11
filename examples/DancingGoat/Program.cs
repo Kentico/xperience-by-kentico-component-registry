@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using CMS.Base;
+using CMS.EmailEngine;
 
 using DancingGoat;
 using DancingGoat.EmailComponents;
@@ -87,6 +88,10 @@ builder.Services.AddSingleton<IEmailActivityTrackingEvaluator, EmailActivityTrac
 
 ConfigureEmailBuilder(builder.Services);
 ConfigureMembershipServices(builder.Services);
+
+builder.Services.AddXperienceSystemSmtp();
+builder.Services.ConfigureSystemSmtpOptions(builder.Configuration.GetSection("SystemSmtpOptions"));
+builder.Services.Configure<SystemEmailOptions>(builder.Configuration.GetSection("SystemEmailOptions"));
 
 if (builder.Environment.IsDevelopment())
 {
