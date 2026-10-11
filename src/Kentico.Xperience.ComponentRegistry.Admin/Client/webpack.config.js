@@ -11,7 +11,7 @@ module.exports = (opts, argv) => {
   const baseConfig = (webpackConfigEnv, argv) => {
     return baseWebpackConfig({
       orgName: 'kentico',
-      projectName: 'xperience-integrations-component-registry-web-admin',
+      projectName: 'xperience-xperience-component-registry-admin',
       webpackConfigEnv,
       argv,
     });

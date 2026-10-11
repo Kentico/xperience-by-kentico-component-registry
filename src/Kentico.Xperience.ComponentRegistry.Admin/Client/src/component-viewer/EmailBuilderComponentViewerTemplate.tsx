@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Input } from './ui/input';
 import { ChevronDown, Loader } from 'lucide-react';
 import { usePageCommand } from '@kentico/xperience-admin-base';
@@ -30,6 +29,7 @@ interface EmailBuilderComponentViewerClientProperties {
   sections: EmailComponentDto[];
   emailTemplates: EmailTemplateDto[];
   canViewEmailBuilderUsages: boolean;
+  componentView: string;
 }
 
 // Table row component for email builder components with expandable details
@@ -214,23 +214,9 @@ export const EmailBuilderComponentViewerTemplate = (
   );
 
   return (
-    <div className="min-h-screen p-8 overflow-x-hidden">
+    <div className="min-h-screen mr-4 overflow-x-hidden">
       <div className="w-full max-w-[110rem] mx-auto">
-        {/* Tabs */}
-        <Tabs defaultValue="widgets" className="w-full">
-          <TabsList className="w-full max-w-md">
-            <TabsTrigger value="widgets">
-              Widgets ({props.widgets.length})
-            </TabsTrigger>
-            <TabsTrigger value="sections">
-              Sections ({props.sections.length})
-            </TabsTrigger>
-            <TabsTrigger value="emailTemplates">
-              Templates ({props.emailTemplates.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="widgets" className="space-y-4">
+        {props.componentView === 'widgets' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -301,9 +287,9 @@ export const EmailBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+        )}
 
-          <TabsContent value="sections" className="space-y-4">
+        {props.componentView === 'sections' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -374,9 +360,9 @@ export const EmailBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+        )}
 
-          <TabsContent value="emailTemplates" className="space-y-4">
+        {props.componentView === 'templates' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -450,8 +436,7 @@ export const EmailBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+        )}
       </div>
     </div>
   );

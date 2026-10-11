@@ -9,7 +9,7 @@
   <ItemGroup>
     <!-- Requires that npm run build or npm run build:dev was executed _before_ the .NET build -->
     <AdminClientPath Include="Client\dist\**" Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-      <ProjectName>xperience-integrations-component-registry-web-admin</ProjectName>
+      <ProjectName>xperience-xperience-component-registry-admin</ProjectName>
     </AdminClientPath>
   </ItemGroup>
 
@@ -31,7 +31,7 @@
 
     <ItemGroup>
       <AdminClientPath Include="Client\dist\**">
-        <ProjectName>xperience-integrations-component-registry-web-admin</ProjectName>
+        <ProjectName>xperience-xperience-component-registry-admin</ProjectName>
       </AdminClientPath>
     </ItemGroup>
   </Target>

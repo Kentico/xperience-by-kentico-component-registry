@@ -14,7 +14,6 @@
   "dependencies": {
     "@kentico/xperience-admin-base": "31.9.2",
     "@kentico/xperience-admin-components": "31.9.2",
-    "@radix-ui/react-tabs": "1.1.22",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
