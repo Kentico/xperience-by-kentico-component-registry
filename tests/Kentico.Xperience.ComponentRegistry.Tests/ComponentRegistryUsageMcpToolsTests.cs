@@ -44,11 +44,10 @@ public class ComponentRegistryUsageMcpToolsTests
     }
 
     [Test]
-    public void GetPageBuilderBatchUsage_RejectsUnsupportedType()
+    public async Task GetPageBuilderBatchUsage_RejectsUnsupportedType()
     {
         var tools = new ComponentRegistryUsageMcpTools(new StubUsageService());
-
-        Assert.ThrowsAsync<ArgumentException>(async () =>
+        await Assert.ThrowsAsync<ArgumentException>(async () =>
             await tools.GetPageBuilderBatchUsage(["x"], "section"));
     }
 
