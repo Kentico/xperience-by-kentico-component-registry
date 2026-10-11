@@ -18,8 +18,8 @@ using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
 using Kentico.Web.Mvc;
-using Kentico.Xperience.ComponentRegistry;
-using Kentico.Xperience.ComponentRegistry.MCP;
+using Kentico.Xperience.Labs.ComponentRegistry;
+using Kentico.Xperience.Labs.ComponentRegistry.MCP;
 using Kentico.Xperience.Mjml;
 
 using Microsoft.AspNetCore.Builder;

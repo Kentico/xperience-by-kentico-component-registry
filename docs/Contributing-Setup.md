@@ -39,7 +39,7 @@ documentation on [creating a new database](https://docs.kentico.com/documentatio
    - `refactor/` - for restructuring of existing features
    - `fix/` - for bugfixes
 
-1. Run `dotnet format` against the `Kentico.Xperience.RepoTemplate` solution
+1. Run `dotnet format` against the `Kentico.Xperience.Labs.ComponentRegistry.slnx` solution
 
    > use `dotnet: format` VS Code task.
 

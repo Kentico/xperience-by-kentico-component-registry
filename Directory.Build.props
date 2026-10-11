@@ -5,7 +5,7 @@
     <Authors>$(Company)</Authors>
     <Copyright>Copyright © $(Company) $([System.DateTime]::Now.Year)</Copyright>
     <Trademark>$(Company)™</Trademark>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <VersionSuffix></VersionSuffix>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
 
@@ -29,10 +29,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CopyDocumentationFilesFromPackages>true</CopyDocumentationFilesFromPackages>
     <CopyDebugSymbolFilesFromPackages>true</CopyDebugSymbolFilesFromPackages>
-    <!-- KXCR0001, S1133: deprecation of old package IDs. Remove when packages are renamed. -->
-    <NoWarn>$(NoWarn);1591;KXCR0001;S1133</NoWarn>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <HotChocolateImplicitUsings>disable</HotChocolateImplicitUsings>
-    <RootNamespace>Kentico.Xperience.ComponentRegistry</RootNamespace>
+    <RootNamespace>Kentico.Xperience.Labs.ComponentRegistry</RootNamespace>
 
     <!-- Set to false to manually control embedded assets in the assembly -->
     <!-- This can impact things like embedded localization .resx files -->

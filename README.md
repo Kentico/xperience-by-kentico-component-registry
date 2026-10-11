@@ -1,17 +1,15 @@
-# Xperience by Kentico Component Registry
+# Xperience by Kentico Labs: Component Registry
 
 [![Kentico Labs](https://img.shields.io/badge/Kentico_Labs-grey?labelColor=orange&logo=data:image/svg+xml;base64,PHN2ZyBjbGFzcz0ic3ZnLWljb24iIHN0eWxlPSJ3aWR0aDogMWVtOyBoZWlnaHQ6IDFlbTt2ZXJ0aWNhbC1hbGlnbjogbWlkZGxlO2ZpbGw6IGN1cnJlbnRDb2xvcjtvdmVyZmxvdzogaGlkZGVuOyIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik05NTYuMjg4IDgwNC40OEw2NDAgMjc3LjQ0VjY0aDMyYzE3LjYgMCAzMi0xNC40IDMyLTMycy0xNC40LTMyLTMyLTMyaC0zMjBjLTE3LjYgMC0zMiAxNC40LTMyIDMyczE0LjQgMzIgMzIgMzJIMzg0djIxMy40NEw2Ny43MTIgODA0LjQ4Qy00LjczNiA5MjUuMTg0IDUxLjIgMTAyNCAxOTIgMTAyNGg2NDBjMTQwLjggMCAxOTYuNzM2LTk4Ljc1MiAxMjQuMjg4LTIxOS41MnpNMjQxLjAyNCA2NDBMNDQ4IDI5NS4wNFY2NGgxMjh2MjMxLjA0TDc4Mi45NzYgNjQwSDI0MS4wMjR6IiAgLz48L3N2Zz4=)](https://github.com/Kentico/.github/blob/main/SUPPORT.md#labs-limited-support) [![CI: Build and Test](https://github.com/Kentico/xperience-by-kentico-component-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/Kentico/xperience-by-kentico-component-registry/actions/workflows/ci.yml)
 
-| Package                                   | NuGet                                                                                                                                                                                                                  |
-| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Kentico.Xperience.ComponentRegistry       | [![Kentico.Xperience.ComponentRegistry - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.ComponentRegistry.svg)](https://www.nuget.org/packages/Kentico.Xperience.ComponentRegistry)                   |
-| Kentico.Xperience.ComponentRegistry.Admin | [![Kentico.Xperience.ComponentRegistry.Admin - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.ComponentRegistry.Admin.svg)](https://www.nuget.org/packages/Kentico.Xperience.ComponentRegistry.Admin) |
-| Kentico.Xperience.ComponentRegistry.MCP   | [![Kentico.Xperience.ComponentRegistry.MCP - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.ComponentRegistry.MCP.svg)](https://www.nuget.org/packages/Kentico.Xperience.ComponentRegistry.MCP)       |
+| Package                                        | NuGet                                                                                                                                                                                                                                 |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kentico.Xperience.Labs.ComponentRegistry       | [![Kentico.Xperience.Labs.ComponentRegistry - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.Labs.ComponentRegistry.svg)](https://www.nuget.org/packages/Kentico.Xperience.Labs.ComponentRegistry)                   |
+| Kentico.Xperience.Labs.ComponentRegistry.Admin | [![Kentico.Xperience.Labs.ComponentRegistry.Admin - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.Labs.ComponentRegistry.Admin.svg)](https://www.nuget.org/packages/Kentico.Xperience.Labs.ComponentRegistry.Admin) |
+| Kentico.Xperience.Labs.ComponentRegistry.MCP   | [![Kentico.Xperience.Labs.ComponentRegistry.MCP - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.Labs.ComponentRegistry.MCP.svg)](https://www.nuget.org/packages/Kentico.Xperience.Labs.ComponentRegistry.MCP)       |
 
-> [!WARNING]
-> These package IDs are deprecated and 2.0.0 is the final release under them. Future releases ship as `Kentico.Xperience.Labs.ComponentRegistry`, `Kentico.Xperience.Labs.ComponentRegistry.Admin`, and `Kentico.Xperience.Labs.ComponentRegistry.MCP` (namespace `Kentico.Xperience.Labs.ComponentRegistry`). See [releases](https://github.com/Kentico/xperience-by-kentico-component-registry/releases).
->
-> Run `dotnet list package --deprecated` to find old references. Suppress warning `KXCR0001` until you migrate, if needed.
+> [!NOTE]
+> Migrating from `Kentico.Xperience.ComponentRegistry*`? These packages were renamed to `Kentico.Xperience.Labs.ComponentRegistry*` (final release under the old IDs: 2.0.0). Version 3.0.0 is functionally equal to 2.0.0. Swap your package references and update `using` statements to `Kentico.Xperience.Labs.ComponentRegistry`.
 
 ## Description
 
@@ -33,10 +31,11 @@ Interested in how and why this library was created? Read the blog post [Dream an
 
 ### Library Version Matrix
 
-| Xperience Version | Library Version |
-| ----------------- | --------------- |
-| >= 31.9.2         | 2.0.0 (final)   |
-| >= 31.2.1         | 1.0.0           |
+| Xperience Version | Library Version | Package ID                                  |
+| ----------------- | --------------- | ------------------------------------------- |
+| >= 31.9.2         | >= 3.0.0        | `Kentico.Xperience.Labs.ComponentRegistry*` |
+| >= 31.9.2         | 2.0.0 (final)   | `Kentico.Xperience.ComponentRegistry*`      |
+| >= 31.2.1         | 1.0.0 - 1.0.1   | `Kentico.Xperience.ComponentRegistry*`      |
 
 ### Dependencies
 
@@ -50,19 +49,19 @@ Add these package to your application using the .NET CLI.
 The core package adds the integration's registry services.
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry
 ```
 
 The admin package adds the component registry administration UI application to the project.
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry.Admin
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry.Admin
 ```
 
 The MCP project adds Component Registry MCP tools that you can register on your application's MCP server.
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry.MCP
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry.MCP
 ```
 
 ## Quick Start
