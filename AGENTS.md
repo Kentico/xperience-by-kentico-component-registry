@@ -4,6 +4,7 @@
 
 - Before a commit, format with: `dotnet format --no-restore`
 - `examples/` is excluded from formatting by `examples/.editorconfig` (`generated_code = true`)
+- The Dancing Goat connection string and management API secret can be committed to source control because they are for local development only.
 
 ## Planning docs (`.agent-resources/`)
 
