@@ -1,0 +1,31 @@
+{
+  "mcpServers": {
+    "kentico-docs-mcp": {
+      "type": "http",
+      "url": "https://docs.kentico.com/mcp"
+    },
+    "DancingGoat": {
+      "type": "http",
+      "url": "http://localhost:18319/mcp"
+    },
+    "xperience-management-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@kentico/management-api-mcp@latest"],
+      "env": {
+        "MANAGEMENT_API_URL": "http://localhost:18319/kentico-api/management",
+        "MANAGEMENT_API_SECRET": "9f4c2a7e1b6d8c305a3f7e2b4c1d9068"
+      }
+    },
+    "io.github.ChromeDevTools/chrome-devtools-mcp": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--registry",
+        "https://registry.npmjs.org",
+        "chrome-devtools-mcp@1.10.1",
+        "--no-usage-statistics"
+      ]
+    }
+  }
+}

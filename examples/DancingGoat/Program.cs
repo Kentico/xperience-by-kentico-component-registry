@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using CMS.Base;
+using CMS.EmailEngine;
+
 using DancingGoat;
 using DancingGoat.EmailComponents;
 using DancingGoat.Helpers.Generators;
 using DancingGoat.Models;
-
-using CMS;
-using CMS.Base;
 
 using Kentico.Activities.Web.Mvc;
 using Kentico.Commerce.Web.Mvc;
@@ -17,23 +17,22 @@ using Kentico.EmailBuilder.Web.Mvc;
 using Kentico.Membership;
 using Kentico.OnlineMarketing.Web.Mvc;
 using Kentico.PageBuilder.Web.Mvc;
+using Kentico.Web.Mvc;
 using Kentico.Xperience.ComponentRegistry;
 using Kentico.Xperience.ComponentRegistry.MCP;
 using Kentico.Xperience.Mjml;
-using Kentico.Web.Mvc;
-
-using ModelContextProtocol.AspNetCore;
-
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
+using ModelContextProtocol.AspNetCore;
 
 using Samples.DancingGoat;
 
@@ -50,7 +49,8 @@ builder.Services.AddKentico(features =>
         {
             LandingPage.CONTENT_TYPE_NAME,
             ContactsPage.CONTENT_TYPE_NAME,
-            ArticlePage.CONTENT_TYPE_NAME
+            ArticlePage.CONTENT_TYPE_NAME,
+            HomePage.CONTENT_TYPE_NAME
         }
     });
 
@@ -89,22 +89,28 @@ builder.Services.AddSingleton<IEmailActivityTrackingEvaluator, EmailActivityTrac
 ConfigureEmailBuilder(builder.Services);
 ConfigureMembershipServices(builder.Services);
 
+builder.Services.AddXperienceSystemSmtp();
+builder.Services.ConfigureSystemSmtpOptions(builder.Configuration.GetSection("SystemSmtpOptions"));
+builder.Services.Configure<SystemEmailOptions>(builder.Configuration.GetSection("SystemEmailOptions"));
+
 if (builder.Environment.IsDevelopment())
 {
     builder.Services.Configure<UrlResolveOptions>(options => options.UseSSL = false);
 }
 
+builder.AddDancingGoatManagementApi();
+
 var app = builder.Build();
 
 app.InitKentico();
-
-app.InitializeDancingGoat();
 
 app.UseStaticFiles();
 
 app.UseCookiePolicy();
 
 app.UseAuthentication();
+
+app.UseDancingGoatManagementApi();
 
 
 app.UseKentico();
@@ -149,7 +155,7 @@ app.Run();
 
 static void ConfigureMembershipServices(IServiceCollection services)
 {
-    services.AddIdentity<ApplicationUser, NoOpApplicationRole>(options =>
+    services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     {
         options.Password.RequireDigit = false;
         options.Password.RequireNonAlphanumeric = false;
@@ -161,16 +167,18 @@ static void ConfigureMembershipServices(IServiceCollection services)
         options.SignIn.RequireConfirmedAccount = true;
     })
         .AddUserStore<ApplicationUserStore<ApplicationUser>>()
-        .AddRoleStore<NoOpApplicationRoleStore>()
+        .AddRoleStore<ApplicationRoleStore<ApplicationRole>>()
         .AddUserManager<UserManager<ApplicationUser>>()
+        .AddRoleManager<RoleManager<ApplicationRole>>()
         .AddSignInManager<SignInManager<ApplicationUser>>();
 
     services.ConfigureApplicationCookie(options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromDays(14);
         options.SlidingExpiration = true;
-        options.AccessDeniedPath = new PathString("/account/login");
-        options.Events.OnRedirectToAccessDenied = ctx =>
+        options.LoginPath = new PathString("/account/login");
+        options.AccessDeniedPath = new PathString("/error/403");
+        options.Events.OnRedirectToLogin = ctx =>
         {
             var factory = ctx.HttpContext.RequestServices.GetRequiredService<IUrlHelperFactory>();
             var urlHelper = factory.GetUrlHelper(new ActionContext(ctx.HttpContext, new RouteData(ctx.HttpContext.Request.RouteValues), new ActionDescriptor()));

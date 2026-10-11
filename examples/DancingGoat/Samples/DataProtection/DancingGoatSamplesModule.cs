@@ -12,6 +12,7 @@ using CMS.DataProtection;
 using CMS.Globalization;
 using CMS.Helpers;
 using CMS.Membership;
+using CMS.Notifications;
 using CMS.OnlineForms;
 
 using DancingGoat.Helpers.Generator;
@@ -28,7 +29,7 @@ using Samples.DancingGoat;
 namespace Samples.DancingGoat
 {
     /// <summary>
-    /// Represents module with DataProtection sample code.
+    /// Represents module with DancingGoat sample code (data protection collectors and the automation notification placeholder configuration).
     /// </summary>
     internal class DancingGoatSamplesModule : Module
     {
@@ -44,11 +45,25 @@ namespace Samples.DancingGoat
 
 
         /// <summary>
+        /// Registers the DancingGoat event handlers.
+        /// </summary>
+        protected override void OnPreInit(ModulePreInitParameters parameters)
+        {
+            base.OnPreInit(parameters);
+
+            parameters.Services.AddInfoObjectEventHandler<InfoObjectBeforeUpdateEvent<ContactInfo>, ContactKeyFieldChangedTriggerHandler>();
+            parameters.Services.AddInfoObjectEventHandler<InfoObjectAfterUpdateEvent<ContactInfo>, ContactKeyFieldChangedTriggerHandler>();
+        }
+
+
+        /// <summary>
         /// Initializes the module.
         /// </summary>
         protected override void OnInit(ModuleInitParameters parameters)
         {
             base.OnInit(parameters);
+
+            NotificationEmailPlaceholderConfigurationStore.Instance.TryAdd(new AutomationProcessNotificationPlaceholders());
 
             InitializeSamples(parameters);
         }
@@ -134,8 +149,7 @@ namespace Samples.DancingGoat
             var contactInfoProvider = parameters.Services.GetRequiredService<IInfoProvider<ContactInfo>>();
             var customerInfoProvider = parameters.Services.GetRequiredService<IInfoProvider<CustomerInfo>>();
             var memberInfoProvider = parameters.Services.GetRequiredService<IMemberInfoProvider>();
-            var identityCollector = new SampleProfileInfoIdentityCollector(profileInfoProvider, profileReferenceInfoProvider,
-                contactInfoProvider, customerInfoProvider, memberInfoProvider);
+            var identityCollector = new SampleProfileInfoIdentityCollector(profileInfoProvider, contactInfoProvider, customerInfoProvider, memberInfoProvider);
 
             IdentityCollectorRegister.Instance.Add(identityCollector);
         }

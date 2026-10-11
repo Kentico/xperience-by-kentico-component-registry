@@ -27,6 +27,13 @@ public interface IComponentUsageService
     public Task<ComponentUsageDetailDto> GetPageBuilderWidgetUsageAsync(string widgetIdentifier);
 
     /// <summary>
+    /// Gets detailed usage information for a specific page builder section.
+    /// </summary>
+    /// <param name="sectionIdentifier">The unique identifier of the section.</param>
+    /// <returns>Component usage details including all pages and language variants.</returns>
+    public Task<ComponentUsageDetailDto> GetPageBuilderSectionUsageAsync(string sectionIdentifier);
+
+    /// <summary>
     /// Gets usage information for multiple components in a batch operation.
     /// </summary>
     /// <param name="identifiers">List of component identifiers to query.</param>
@@ -40,6 +47,13 @@ public interface IComponentUsageService
     /// <param name="widgetIdentifier">The unique identifier of the email widget.</param>
     /// <returns>Email configuration usage details including all email configurations and language variants.</returns>
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderWidgetUsageAsync(string widgetIdentifier);
+
+    /// <summary>
+    /// Gets detailed usage information for a specific email builder section.
+    /// </summary>
+    /// <param name="sectionIdentifier">The unique identifier of the section.</param>
+    /// <returns>Email configuration usage details including all configurations and language variants.</returns>
+    public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderSectionUsageAsync(string sectionIdentifier);
 
     /// <summary>
     /// Gets detailed usage information for a specific email builder template.
@@ -85,6 +99,12 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
             "ContentItemCommonDataVisualBuilderWidgets");
 
     /// <inheritdoc/>
+    public Task<ComponentUsageDetailDto> GetPageBuilderSectionUsageAsync(string sectionIdentifier) => GetComponentUsage(
+            sectionIdentifier,
+            "Section",
+            "ContentItemCommonDataVisualBuilderWidgets");
+
+    /// <inheritdoc/>
     public async Task<List<ComponentUsageDetailDto>> GetBatchUsageAsync(
         List<string> identifiers,
         string componentType)
@@ -107,6 +127,12 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
     public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderWidgetUsageAsync(string widgetIdentifier) => GetEmailComponentUsage(
             widgetIdentifier,
             "EmailWidget",
+            "ContentItemCommonDataVisualBuilderWidgets");
+
+    /// <inheritdoc/>
+    public Task<EmailConfigurationUsageDetailDto> GetEmailBuilderSectionUsageAsync(string sectionIdentifier) => GetEmailComponentUsage(
+            sectionIdentifier,
+            "EmailSection",
             "ContentItemCommonDataVisualBuilderWidgets");
 
     /// <inheritdoc/>
@@ -148,6 +174,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     WPI.WebPageItemTreePath,
                     WPI.WebPageItemWebsiteChannelID,
                     C.ChannelDisplayName,
+                    CT.ClassDisplayName AS ContentTypeDisplayName,
                     CI.ContentItemID,
                     CL.ContentLanguageID,
                     CL.ContentLanguageName,
@@ -157,6 +184,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     CICD.[{configColumnName}]
                 FROM CMS_WebPageItem WPI
                 INNER JOIN CMS_ContentItem CI ON WPI.WebPageItemContentItemID = CI.ContentItemID
+                LEFT JOIN CMS_Class CT ON CI.ContentItemContentTypeID = CT.ClassID
                 INNER JOIN CMS_ContentItemCommonData CICD ON CI.ContentItemID = CICD.ContentItemCommonDataContentItemID
                 INNER JOIN CMS_ContentLanguage CL ON CICD.ContentItemCommonDataContentLanguageID = CL.ContentLanguageID
                 INNER JOIN CMS_Channel C ON CI.ContentItemChannelID = C.ChannelID
@@ -188,6 +216,10 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     string pageName = reader.GetString(reader.GetOrdinal("WebPageItemName"));
                     string pagePath = reader.GetString(reader.GetOrdinal("WebPageItemTreePath"));
                     string channelDisplayName = reader.GetString(reader.GetOrdinal("ChannelDisplayName"));
+                    int contentTypeOrdinal = reader.GetOrdinal("ContentTypeDisplayName");
+                    string contentTypeDisplayName = !await reader.IsDBNullAsync(contentTypeOrdinal, cancellationToken)
+                        ? reader.GetString(contentTypeOrdinal)
+                        : string.Empty;
                     int websiteChannelID = reader.GetInt32(reader.GetOrdinal("WebPageItemWebsiteChannelID"));
                     int contentItemId = reader.GetInt32(reader.GetOrdinal("ContentItemID"));
                     string languageName = reader.GetString(reader.GetOrdinal("ContentLanguageName"));
@@ -220,6 +252,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                             PagePath = pagePath,
                             WebsiteChannelID = websiteChannelID,
                             ChannelDisplayName = channelDisplayName,
+                            ContentTypeDisplayName = contentTypeDisplayName,
                             CreatedAt = DateTime.UtcNow,
                             Variants = []
                         };
@@ -277,6 +310,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     EC.EmailConfigurationName,
                     EC.EmailConfigurationPurpose,
                     C.ChannelDisplayName,
+                    CT.ClassDisplayName AS ContentTypeDisplayName,
                     CI.ContentItemID,
                     CL.ContentLanguageID,
                     CL.ContentLanguageName,
@@ -286,6 +320,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     CICD.[{configColumnName}]
                 FROM EmailLibrary_EmailConfiguration EC
                 INNER JOIN CMS_ContentItem CI ON EC.EmailConfigurationContentItemID = CI.ContentItemID
+                LEFT JOIN CMS_Class CT ON CI.ContentItemContentTypeID = CT.ClassID
                 INNER JOIN CMS_ContentItemCommonData CICD ON CI.ContentItemID = CICD.ContentItemCommonDataContentItemID
                 INNER JOIN CMS_ContentLanguage CL ON CICD.ContentItemCommonDataContentLanguageID = CL.ContentLanguageID
                 INNER JOIN CMS_Channel C ON CI.ContentItemChannelID = C.ChannelID
@@ -318,6 +353,10 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                     string configurationPurpose = reader.GetString(reader.GetOrdinal("EmailConfigurationPurpose"));
                     int emailChannelID = reader.GetInt32(reader.GetOrdinal("EmailConfigurationEmailChannelID"));
                     string channelDisplayName = reader.GetString(reader.GetOrdinal("ChannelDisplayName"));
+                    int contentTypeOrdinal = reader.GetOrdinal("ContentTypeDisplayName");
+                    string contentTypeDisplayName = !await reader.IsDBNullAsync(contentTypeOrdinal, cancellationToken)
+                        ? reader.GetString(contentTypeOrdinal)
+                        : string.Empty;
                     int contentItemId = reader.GetInt32(reader.GetOrdinal("ContentItemID"));
                     string languageName = reader.GetString(reader.GetOrdinal("ContentLanguageName"));
                     int commonDataId = reader.GetInt32(reader.GetOrdinal("ContentItemCommonDataID"));
@@ -349,6 +388,7 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                             ConfigurationPurpose = configurationPurpose,
                             EmailChannelID = emailChannelID,
                             ChannelDisplayName = channelDisplayName,
+                            ContentTypeDisplayName = contentTypeDisplayName,
                             CreatedAt = DateTime.UtcNow,
                             Variants = []
                         };
@@ -730,6 +770,11 @@ public class PageUsageDto
     public string ChannelDisplayName { get; set; } = string.Empty;
 
     /// <summary>
+    /// The display name of the content type this page belongs to.
+    /// </summary>
+    public string ContentTypeDisplayName { get; set; } = string.Empty;
+
+    /// <summary>
     /// The date when the page was created.
     /// </summary>
     public DateTime CreatedAt { get; set; }
@@ -861,6 +906,11 @@ public class EmailConfigurationUsageDto
     /// The display name of the channel this email configuration belongs to.
     /// </summary>
     public string ChannelDisplayName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The display name of the content type this email configuration belongs to.
+    /// </summary>
+    public string ContentTypeDisplayName { get; set; } = string.Empty;
 
     /// <summary>
     /// The date when the email configuration was created.

@@ -14,9 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Input } from './ui/input';
-import { Headline } from './ui/headline';
 import { ChevronDown, Loader } from 'lucide-react';
 import { usePageCommand } from '@kentico/xperience-admin-base';
 import { ComponentDetailsPanel } from './ComponentDetails';
@@ -31,6 +29,7 @@ interface PageBuilderComponentViewerClientProperties {
   sections: ComponentDto[];
   pageTemplates: PageTemplateDto[];
   canViewPageBuilderUsages: boolean;
+  componentView: string;
 }
 
 // Table row component with expandable details
@@ -216,33 +215,9 @@ export const PageBuilderComponentViewerTemplate = (
   );
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="w-full max-w-[110rem] mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <Headline size="L">
-            Component Registry
-          </Headline>
-          <p className="text-lg xp-text-muted">
-            Browse and explore all registered components in the system
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="widgets" className="w-full">
-          <TabsList className="w-full max-w-md">
-            <TabsTrigger value="widgets">
-              Widgets ({props.widgets.length})
-            </TabsTrigger>
-            <TabsTrigger value="sections">
-              Sections ({props.sections.length})
-            </TabsTrigger>
-            <TabsTrigger value="pageTemplates">
-              Templates ({props.pageTemplates.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="widgets" className="space-y-4">
+    <div className="min-h-screen mr-4">
+      <div className="w-full max-w-[110rem] mx-auto">
+        {props.componentView === 'widgets' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -313,9 +288,9 @@ export const PageBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+        )}
 
-          <TabsContent value="sections" className="space-y-4">
+        {props.componentView === 'sections' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -386,9 +361,9 @@ export const PageBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+        )}
 
-          <TabsContent value="pageTemplates" className="space-y-4">
+        {props.componentView === 'templates' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -462,8 +437,7 @@ export const PageBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+        )}
       </div>
     </div>
   );

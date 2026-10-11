@@ -24,4 +24,22 @@ public class ComponentRegistryDefinitionMcpToolsTests
             Assert.That(response.Items.Any(i => i.ComponentType == "page-template" && i.Identifier == "pt1"), Is.True);
         }
     }
+
+    [TestCase("page", "page.section")]
+    [TestCase("email", "email.section")]
+    [TestCase("form", "form.section")]
+    public async Task ListComponentDefinitions_ReturnsSectionItems(string builder, string expectedIdentifier)
+    {
+        var tools = new ComponentRegistryDefinitionMcpTools(
+            new StubReadService(
+                new PageBuilderRegistryReadModel([], [new ComponentDto("page.section", "Page section", null, null, null)], []),
+                new EmailBuilderRegistryReadModel([], [new EmailComponentDto("email.section", "Email section", null, null, null, null)], []),
+                new FormBuilderRegistryReadModel([], [new FormSectionDto("form.section", "Form section", null, null, null)])));
+
+        var response = await tools.ListComponentDefinitions(builder, "section");
+
+        Assert.That(response.Items, Has.Count.EqualTo(1));
+        Assert.That(response.Items[0].ComponentType, Is.EqualTo("section"));
+        Assert.That(response.Items[0].Identifier, Is.EqualTo(expectedIdentifier));
+    }
 }

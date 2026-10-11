@@ -15,9 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from './ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Input } from './ui/input';
-import { Headline } from './ui/headline';
 import { Callout } from './ui/callout';
 import { ChevronDown, Link, Loader } from 'lucide-react';
 import {
@@ -30,6 +28,7 @@ interface FormBuilderComponentViewerClientProperties {
   formComponents: FormComponentDto[];
   formSections: FormSectionDto[];
   canViewFormBuilderUsages: boolean;
+  componentView: string;
 }
 
 // Table row component for form builder components
@@ -359,31 +358,9 @@ export const FormBuilderComponentViewerTemplate = (
   );
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="w-full max-w-[110rem] mx-auto space-y-8">
-        {/* Header */}
-        <div className="space-y-2">
-          <Headline size="L">
-            Form Builder Components
-          </Headline>
-          <p className="text-lg xp-text-muted">
-            Browse and explore all registered form builder components in the
-            system
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <Tabs defaultValue="components" className="w-full">
-          <TabsList className="w-full max-w-md">
-            <TabsTrigger value="components">
-              Components ({props.formComponents.length})
-            </TabsTrigger>
-            <TabsTrigger value="sections">
-              Sections ({props.formSections.length})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="components" className="space-y-4">
+    <div className="min-h-screen mr-4">
+      <div className="w-full max-w-[110rem] mx-auto">
+        {props.componentView === 'components' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -454,9 +431,9 @@ export const FormBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
+        )}
 
-          <TabsContent value="sections" className="space-y-4">
+        {props.componentView === 'sections' && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl">
@@ -527,8 +504,7 @@ export const FormBuilderComponentViewerTemplate = (
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
-        </Tabs>
+        )}
       </div>
     </div>
   );

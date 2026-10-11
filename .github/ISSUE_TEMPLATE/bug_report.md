@@ -30,7 +30,7 @@ Environment details:
 
 - OS: [e.g. macOS 15.3, Ubuntu 24.04, Windows 11]
 - .NET SDK: [e.g. 10.0.102]
-- Xperience version: [e.g. 31.2.1]
+- Xperience version: [e.g. 31.9.2]
 - Database: [e.g. SQL Server 2022]
 - Browser (if UI-related): [e.g. Chrome 145]
 

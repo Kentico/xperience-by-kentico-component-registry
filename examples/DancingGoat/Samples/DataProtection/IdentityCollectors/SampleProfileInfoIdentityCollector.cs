@@ -3,6 +3,7 @@ using System.Linq;
 
 using CMS.Commerce;
 using CMS.ContactManagement;
+using CMS.ContactManagement.Internal;
 using CMS.DataEngine;
 using CMS.DataProtection;
 using CMS.Membership;
@@ -15,7 +16,6 @@ namespace Samples.DancingGoat
     internal class SampleProfileInfoIdentityCollector : IIdentityCollector
     {
         private readonly IInfoProvider<ProfileInfo> profileInfoProvider;
-        private readonly IInfoProvider<ProfileReferenceInfo> profileReferenceInfoProvider;
         private readonly IInfoProvider<ContactInfo> contactInfoProvider;
         private readonly IInfoProvider<CustomerInfo> customerInfoProvider;
         private readonly IMemberInfoProvider memberInfoProvider;
@@ -25,19 +25,16 @@ namespace Samples.DancingGoat
         /// Initializes a new instance of the <see cref="SampleProfileInfoIdentityCollector"/> class.
         /// </summary>
         /// <param name="profileInfoProvider">Profile info provider.</param>
-        /// <param name="profileReferenceInfoProvider">Profile reference info provider.</param>
         /// <param name="contactInfoProvider">Contact info provider.</param>
         /// <param name="customerInfoProvider">Customer info provider.</param>
         /// <param name="memberInfoProvider">Member info provider.</param>
         public SampleProfileInfoIdentityCollector(
             IInfoProvider<ProfileInfo> profileInfoProvider,
-            IInfoProvider<ProfileReferenceInfo> profileReferenceInfoProvider,
             IInfoProvider<ContactInfo> contactInfoProvider,
             IInfoProvider<CustomerInfo> customerInfoProvider,
             IMemberInfoProvider memberInfoProvider)
         {
             this.profileInfoProvider = profileInfoProvider;
-            this.profileReferenceInfoProvider = profileReferenceInfoProvider;
             this.contactInfoProvider = contactInfoProvider;
             this.customerInfoProvider = customerInfoProvider;
             this.memberInfoProvider = memberInfoProvider;
@@ -67,9 +64,7 @@ namespace Samples.DancingGoat
             {
                 identities.Add(profile);
 
-                var reference = profileReferenceInfoProvider.Get()
-                                                            .WhereEquals(nameof(ProfileReferenceInfo.ProfileReferenceProfileID), profile.ProfileID)
-                                                            .SingleOrDefault();
+                var reference = profile.GetReferenceOrThrow();
                 if (reference != null)
                 {
                     if (reference.ProfileReferenceContactID > 0)

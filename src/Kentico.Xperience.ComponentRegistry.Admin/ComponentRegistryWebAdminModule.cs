@@ -15,7 +15,7 @@ namespace Kentico.Xperience.ComponentRegistry.Admin
         {
             base.OnInit();
 
-            RegisterClientModule("kentico", "xperience-integrations-component-registry-web-admin");
+            RegisterClientModule("kentico", "xperience-xperience-component-registry-admin");
         }
     }
 }

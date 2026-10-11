@@ -9,7 +9,7 @@ using Kentico.Xperience.ComponentRegistry.Admin;
     identifier: ComponentRegistryApplicationPage.IDENTIFIER,
     type: typeof(ComponentRegistryApplicationPage),
     slug: "component-registry",
-    name: "Component Registry",
+    name: "Component Registry (Labs)",
     category: BaseApplicationCategories.DEVELOPMENT,
     icon: Icons.CustomElement,
     templateName: TemplateNames.SECTION_LAYOUT)]

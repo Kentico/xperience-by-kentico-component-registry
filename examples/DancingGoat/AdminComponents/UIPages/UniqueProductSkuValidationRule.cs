@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 using CMS.ContentEngine;
@@ -51,7 +52,7 @@ internal class UniqueProductSkuValidationRule : ValidationRule<string>
         int contentItemId = contentItemFormContext.ItemId;
 
         // Try to find a colliding content item using the provided SKU code
-        int? collidingContentItemIdentifier = await productSkuValidator.GetCollidingContentItem(value, contentItemId);
+        int? collidingContentItemIdentifier = await productSkuValidator.GetCollidingContentItem(value, contentItemId, CancellationToken.None);
 
         if (collidingContentItemIdentifier == null)
         {

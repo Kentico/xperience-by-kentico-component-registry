@@ -8,25 +8,50 @@ using Kentico.Xperience.ComponentRegistry.Admin;
     parentType: typeof(ComponentRegistryApplicationPage),
     slug: "form-builder",
     name: "Form Builder",
-    templateName: "@kentico/xperience-integrations-component-registry-web-admin/FormBuilderComponentViewer",
+    templateName: TemplateNames.SECTION_LAYOUT,
     order: 3,
     Icon = Icons.CustomElement)]
+[assembly: UIPage(
+    uiPageType: typeof(FormBuilderComponentsPage),
+    parentType: typeof(FormBuilderComponentViewerPage),
+    slug: "components",
+    name: "Components",
+    templateName: "@kentico/xperience-xperience-component-registry-admin/FormBuilderComponentViewer",
+    order: 1)]
+[assembly: UIPage(
+    uiPageType: typeof(FormBuilderSectionsPage),
+    parentType: typeof(FormBuilderComponentViewerPage),
+    slug: "sections",
+    name: "Sections",
+    templateName: "@kentico/xperience-xperience-component-registry-admin/FormBuilderComponentViewer",
+    order: 2)]
 
 namespace Kentico.Xperience.ComponentRegistry.Admin;
 
 /// <summary>
-/// Page for displaying all registered form builder component definitions.
+/// Form Builder section. Redirects to its first child page.
 /// </summary>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
-public class FormBuilderComponentViewerPage(
+[UINavigation(true)]
+public class FormBuilderComponentViewerPage : SecondaryMenuSectionPage;
+
+/// <summary>
+/// Base page for displaying registered Form Builder components of a single type.
+/// </summary>
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
+public abstract class FormBuilderComponentListingPage(
     IPageLinkGenerator pageLinkGenerator,
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator) : Page<FormBuilderComponentViewerPageClientProperties>
 {
+    protected abstract string ComponentView { get; }
+
     public override async Task<FormBuilderComponentViewerPageClientProperties> ConfigureTemplateProperties(
         FormBuilderComponentViewerPageClientProperties properties)
     {
+        properties.ComponentView = ComponentView;
+
         var model = await componentRegistryReadService.GetFormBuilderRegistryAsync();
 
         properties.FormComponents = model.FormComponents;
@@ -91,6 +116,28 @@ public class FormBuilderComponentViewerPage(
     }
 }
 
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
+public class FormBuilderComponentsPage(
+    IPageLinkGenerator pageLinkGenerator,
+    IComponentRegistryReadService componentRegistryReadService,
+    IComponentUsageService componentUsageService,
+    IUIPermissionEvaluator permissionEvaluator)
+    : FormBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+{
+    protected override string ComponentView => "components";
+}
+
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
+public class FormBuilderSectionsPage(
+    IPageLinkGenerator pageLinkGenerator,
+    IComponentRegistryReadService componentRegistryReadService,
+    IComponentUsageService componentUsageService,
+    IUIPermissionEvaluator permissionEvaluator)
+    : FormBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+{
+    protected override string ComponentView => "sections";
+}
+
 /// <summary>
 /// Client properties for the form builder component viewer page.
 /// </summary>
@@ -99,4 +146,5 @@ public class FormBuilderComponentViewerPageClientProperties : TemplateClientProp
     public IEnumerable<FormComponentDto> FormComponents { get; set; } = [];
     public IEnumerable<FormSectionDto> FormSections { get; set; } = [];
     public bool CanViewFormBuilderUsages { get; set; }
+    public string ComponentView { get; set; } = string.Empty;
 }

@@ -14,6 +14,7 @@ export interface PageUsageDto {
   pageName: string;
   pagePath: string;
   channelDisplayName: string;
+  contentTypeDisplayName: string;
   isPublished: boolean;
   createdAt: string;
   modifiedAt?: string;
@@ -79,6 +80,7 @@ export interface EmailConfigurationUsageDto {
   configurationName: string;
   configurationPurpose: string;
   channelDisplayName: string;
+  contentTypeDisplayName: string;
   createdAt: string;
   modifiedAt?: string;
   variants: EmailConfigurationVariantDto[];

@@ -8,25 +8,57 @@ using Kentico.Xperience.ComponentRegistry.Admin;
     parentType: typeof(ComponentRegistryApplicationPage),
     slug: "page-builder",
     name: "Page Builder",
-    templateName: "@kentico/xperience-integrations-component-registry-web-admin/PageBuilderComponentViewer",
+    templateName: TemplateNames.SECTION_LAYOUT,
     order: 1,
     Icon = Icons.CustomElement)]
+[assembly: UIPage(
+    uiPageType: typeof(PageBuilderWidgetsPage),
+    parentType: typeof(PageBuilderComponentViewerPage),
+    slug: "widgets",
+    name: "Widgets",
+    templateName: "@kentico/xperience-xperience-component-registry-admin/PageBuilderComponentViewer",
+    order: 1)]
+[assembly: UIPage(
+    uiPageType: typeof(PageBuilderSectionsPage),
+    parentType: typeof(PageBuilderComponentViewerPage),
+    slug: "sections",
+    name: "Sections",
+    templateName: "@kentico/xperience-xperience-component-registry-admin/PageBuilderComponentViewer",
+    order: 2)]
+[assembly: UIPage(
+    uiPageType: typeof(PageBuilderTemplatesPage),
+    parentType: typeof(PageBuilderComponentViewerPage),
+    slug: "page-templates",
+    name: "Page Templates",
+    templateName: "@kentico/xperience-xperience-component-registry-admin/PageBuilderComponentViewer",
+    order: 3)]
 
 namespace Kentico.Xperience.ComponentRegistry.Admin;
 
 /// <summary>
-/// Page for displaying all registered component definitions.
+/// Page Builder section. Redirects to its first child page.
 /// </summary>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
-public class PageBuilderComponentViewerPage(
+[UINavigation(true)]
+public class PageBuilderComponentViewerPage : SecondaryMenuSectionPage;
+
+/// <summary>
+/// Base page for displaying registered Page Builder components of a single type.
+/// </summary>
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
+public abstract class PageBuilderComponentListingPage(
     IPageLinkGenerator pageLinkGenerator,
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator) : Page<PageBuilderComponentViewerPageClientProperties>
 {
+    protected abstract string ComponentView { get; }
+
     public override async Task<PageBuilderComponentViewerPageClientProperties> ConfigureTemplateProperties(
         PageBuilderComponentViewerPageClientProperties properties)
     {
+        properties.ComponentView = ComponentView;
+
         var model = await componentRegistryReadService.GetPageBuilderRegistryAsync();
 
         properties.Widgets = model.Widgets;
@@ -84,6 +116,39 @@ public class PageBuilderComponentViewerPage(
     }
 }
 
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
+public class PageBuilderWidgetsPage(
+   IPageLinkGenerator pageLinkGenerator,
+   IComponentRegistryReadService componentRegistryReadService,
+   IComponentUsageService componentUsageService,
+   IUIPermissionEvaluator permissionEvaluator)
+   : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+{
+    protected override string ComponentView => "widgets";
+}
+
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
+public class PageBuilderSectionsPage(
+    IPageLinkGenerator pageLinkGenerator,
+    IComponentRegistryReadService componentRegistryReadService,
+    IComponentUsageService componentUsageService,
+    IUIPermissionEvaluator permissionEvaluator)
+    : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+{
+    protected override string ComponentView => "sections";
+}
+
+[UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
+public class PageBuilderTemplatesPage(
+    IPageLinkGenerator pageLinkGenerator,
+    IComponentRegistryReadService componentRegistryReadService,
+    IComponentUsageService componentUsageService,
+    IUIPermissionEvaluator permissionEvaluator)
+    : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+{
+    protected override string ComponentView => "templates";
+}
+
 /// <summary>
 /// Client properties for the component viewer page.
 /// </summary>
@@ -93,4 +158,5 @@ public class PageBuilderComponentViewerPageClientProperties : TemplateClientProp
     public IEnumerable<ComponentDto> Sections { get; set; } = [];
     public IEnumerable<PageTemplateDto> PageTemplates { get; set; } = [];
     public bool CanViewPageBuilderUsages { get; set; }
+    public string ComponentView { get; set; } = string.Empty;
 }

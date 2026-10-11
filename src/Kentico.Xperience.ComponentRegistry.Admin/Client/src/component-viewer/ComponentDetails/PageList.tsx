@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import { PageListItem } from './PageListItem';
 import { PageUsageDto } from './types';
 import { Input } from '../ui/input';
@@ -19,15 +19,27 @@ export const PageList: React.FC<PageListProps> = ({
   inspectedComponentTypeName,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedContentType, setSelectedContentType] = useState('');
+
+  const contentTypeOptions = useMemo(
+    () =>
+      [...new Set(pages.map((page) => page.contentTypeDisplayName).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b)),
+    [pages],
+  );
 
   const filteredPages = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return pages;
-    }
-    return pages.filter((page) =>
-      page.pageName.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [pages, searchTerm]);
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return pages.filter((page) => {
+      const matchesSearch = !normalizedSearch ||
+        page.pageName.toLowerCase().includes(normalizedSearch);
+      const matchesContentType = !selectedContentType ||
+        page.contentTypeDisplayName === selectedContentType;
+
+      return matchesSearch && matchesContentType;
+    });
+  }, [pages, searchTerm, selectedContentType]);
 
   if (pages.length === 0) {
     return (
@@ -42,18 +54,39 @@ export const PageList: React.FC<PageListProps> = ({
   return (
     <div>
       <div className="mb-4">
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 xp-muted-dash"
-          />
-          <Input
-            type="text"
-            placeholder="Search pages by name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 text-sm"
-          />
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 xp-muted-dash"
+            />
+            <Input
+              type="text"
+              placeholder="Search pages by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 text-sm"
+            />
+          </div>
+          <div className="xp-input-wrapper relative min-w-48 sm:w-64">
+            <select
+              value={selectedContentType}
+              onChange={(e) => setSelectedContentType(e.target.value)}
+              className="xp-input appearance-none pr-10 text-sm"
+              aria-label="Filter by content type"
+            >
+              <option value="">All content types</option>
+              {contentTypeOptions.map((contentType) => (
+                <option key={contentType} value={contentType}>
+                  {contentType}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 xp-icon-muted"
+            />
+          </div>
         </div>
       </div>
 
@@ -64,7 +97,7 @@ export const PageList: React.FC<PageListProps> = ({
       <div className="space-y-2">
         {filteredPages.length === 0 ? (
           <Callout type="info">
-            No pages match &quot;{searchTerm}&quot;.
+            No pages match the selected filters.
           </Callout>
         ) : (
           filteredPages.map((page) => (

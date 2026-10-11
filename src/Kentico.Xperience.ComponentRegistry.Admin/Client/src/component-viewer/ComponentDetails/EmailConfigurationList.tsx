@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Search } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import { EmailConfigurationListItem } from './EmailConfigurationListItem';
 import type { EmailConfigurationUsageDto } from './types';
 import { Input } from '../ui/input';
@@ -19,15 +19,27 @@ export const EmailConfigurationList: React.FC<EmailConfigurationListProps> = ({
   inspectedComponentTypeName,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedContentType, setSelectedContentType] = useState('');
+
+  const contentTypeOptions = useMemo(
+    () =>
+      [...new Set(emailConfigurations.map((config) => config.contentTypeDisplayName).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b)),
+    [emailConfigurations],
+  );
 
   const filteredConfigurations = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return emailConfigurations;
-    }
-    return emailConfigurations.filter((config) =>
-      config.configurationName.toLowerCase().includes(searchTerm.toLowerCase()),
-    );
-  }, [emailConfigurations, searchTerm]);
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return emailConfigurations.filter((config) => {
+      const matchesSearch = !normalizedSearch ||
+        config.configurationName.toLowerCase().includes(normalizedSearch);
+      const matchesContentType = !selectedContentType ||
+        config.contentTypeDisplayName === selectedContentType;
+
+      return matchesSearch && matchesContentType;
+    });
+  }, [emailConfigurations, searchTerm, selectedContentType]);
 
   if (emailConfigurations.length === 0) {
     return (
@@ -42,18 +54,39 @@ export const EmailConfigurationList: React.FC<EmailConfigurationListProps> = ({
   return (
     <div>
       <div className="mb-4">
-        <div className="relative">
-          <Search
-            size={16}
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 xp-muted-dash"
-          />
-          <Input
-            type="text"
-            placeholder="Search configurations by name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 text-sm"
-          />
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 xp-muted-dash"
+            />
+            <Input
+              type="text"
+              placeholder="Search configurations by name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 text-sm"
+            />
+          </div>
+          <div className="xp-input-wrapper relative min-w-48 sm:w-64">
+            <select
+              value={selectedContentType}
+              onChange={(e) => setSelectedContentType(e.target.value)}
+              className="xp-input appearance-none pr-10 text-sm"
+              aria-label="Filter by content type"
+            >
+              <option value="">All content types</option>
+              {contentTypeOptions.map((contentType) => (
+                <option key={contentType} value={contentType}>
+                  {contentType}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 xp-icon-muted"
+            />
+          </div>
         </div>
       </div>
 
