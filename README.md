@@ -18,23 +18,11 @@ Interested in how and why this library was created? Read the blog post [Dream an
 
 ### Screenshots
 
-<div style="display: flex; gap: 1rem; flex-wrap: wrap">
-  <a href="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-page-builder.jpg">
-    <img src="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-page-builder.jpg"
-    width="600" alt="Component registry for Page Builder in Xperience administration">
-  </a>
+![Component registry for Page Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/images/component-registry-admin-page-builder.jpg)
 
-  <a href="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-email-builder.jpg">
-    <img src="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-email-builder.jpg"
-    width="600" alt="Component registry for Email Builder in Xperience administration">
-  </a>
+![Component registry for Email Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/images/component-registry-admin-email-builder.jpg)
 
-  <a href="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-form-builder.jpg">
-    <img src="https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/main/images/component-registry-admin-form-builder.jpg"
-    width="600" alt="Component registry for Form Builder in Xperience administration">
-  </a>
-
-  </div>
+![Component registry for Form Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/images/component-registry-admin-form-builder.jpg)
 
 ## Requirements
 
