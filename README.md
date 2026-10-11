@@ -8,6 +8,11 @@
 | Kentico.Xperience.ComponentRegistry.Admin | [![Kentico.Xperience.ComponentRegistry.Admin - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.ComponentRegistry.Admin.svg)](https://www.nuget.org/packages/Kentico.Xperience.ComponentRegistry.Admin) |
 | Kentico.Xperience.ComponentRegistry.MCP   | [![Kentico.Xperience.ComponentRegistry.MCP - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.ComponentRegistry.MCP.svg)](https://www.nuget.org/packages/Kentico.Xperience.ComponentRegistry.MCP)       |
 
+> [!WARNING]
+> These package IDs are deprecated and 2.0.0 is the final release under them. Future releases ship as `Kentico.Xperience.Labs.ComponentRegistry`, `Kentico.Xperience.Labs.ComponentRegistry.Admin`, and `Kentico.Xperience.Labs.ComponentRegistry.MCP` (namespace `Kentico.Xperience.Labs.ComponentRegistry`). See [releases](https://github.com/Kentico/xperience-by-kentico-component-registry/releases).
+>
+> Run `dotnet list package --deprecated` to find old references. Suppress warning `KXCR0001` until you migrate, if needed.
+
 ## Description
 
 This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets, and explore which channels and web pages use those components all through a friendly user interface in the Xperience administration.
@@ -30,7 +35,7 @@ Interested in how and why this library was created? Read the blog post [Dream an
 
 | Xperience Version | Library Version |
 | ----------------- | --------------- |
-| >= 31.9.2         | 2.0.0           |
+| >= 31.9.2         | 2.0.0 (final)   |
 | >= 31.2.1         | 1.0.0           |
 
 ### Dependencies

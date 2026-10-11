@@ -20,6 +20,7 @@ public static class ServiceCollectionComponentRegistryExtensions
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <returns>Service collection for chaining</returns>
+    [Obsolete(DeprecationMessages.PackageRenamed, DiagnosticId = DeprecationMessages.DiagnosticId, UrlFormat = DeprecationMessages.Url)]
     public static IServiceCollection AddComponentRegistry(this IServiceCollection services)
     {
         var assemblies = AppDomain.CurrentDomain
@@ -37,6 +38,7 @@ public static class ServiceCollectionComponentRegistryExtensions
     /// <param name="services">Service collection</param>
     /// <param name="assembliesToScan">Assemblies to scan for component registrations</param>
     /// <returns>Service collection for chaining</returns>
+    [Obsolete(DeprecationMessages.PackageRenamed, DiagnosticId = DeprecationMessages.DiagnosticId, UrlFormat = DeprecationMessages.Url)]
     public static IServiceCollection AddComponentRegistry(this IServiceCollection services, IEnumerable<Assembly> assembliesToScan)
     {
         var assemblies = assembliesToScan.ToList();

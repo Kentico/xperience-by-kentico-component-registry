@@ -1,5 +1,10 @@
 # Usage Guide
 
+> [!WARNING]
+> These package IDs are deprecated and 2.0.0 is the final release under them. Future releases ship as `Kentico.Xperience.Labs.ComponentRegistry`, `Kentico.Xperience.Labs.ComponentRegistry.Admin`, and `Kentico.Xperience.Labs.ComponentRegistry.MCP` (namespace `Kentico.Xperience.Labs.ComponentRegistry`). See [releases](https://github.com/Kentico/xperience-by-kentico-component-registry/releases).
+>
+> Run `dotnet list package --deprecated` to find old references. Suppress warning `KXCR0001` until you migrate, if needed.
+
 ## Setup
 
 Add the "Admin" package to your ASP.NET Core application using the .NET CLI. This includes the custom admin UI application and all required services.

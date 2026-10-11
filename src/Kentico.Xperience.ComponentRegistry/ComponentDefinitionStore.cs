@@ -4,6 +4,7 @@ namespace Kentico.Xperience.ComponentRegistry;
 /// Service to store and retrieve component definitions.
 /// </summary>
 /// <typeparam name="TDefinition">The type of definition stored.</typeparam>
+[Obsolete(DeprecationMessages.PackageRenamed, DiagnosticId = DeprecationMessages.DiagnosticId, UrlFormat = DeprecationMessages.Url)]
 public interface IComponentDefinitionStore<TDefinition>
 {
     /// <summary>
