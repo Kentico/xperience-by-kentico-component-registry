@@ -1,3 +1,5 @@
+using CMS.Automation.Internal;
+
 namespace Kentico.Xperience.Labs.ComponentRegistry;
 
 /// <summary>
@@ -19,6 +21,11 @@ public interface IComponentRegistryReadService
     /// Gets all form builder component definitions.
     /// </summary>
     public Task<FormBuilderRegistryReadModel> GetFormBuilderRegistryAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets all custom automation trigger, action, and condition definitions.
+    /// </summary>
+    public Task<AutomationRegistryReadModel> GetAutomationRegistryAsync(CancellationToken cancellationToken = default);
 }
 
 /// <summary>
@@ -33,6 +40,9 @@ public class ComponentRegistryReadService(
     IComponentDefinitionStore<EmailBuilderTemplateDefinition> emailBuilderTemplateStore,
     IComponentDefinitionStore<FormBuilderComponentDefinition> formBuilderComponentStore,
     IComponentDefinitionStore<FormBuilderSectionDefinition> formBuilderSectionStore,
+    ICustomAutomationTriggerProvider automationTriggerProvider,
+    ICustomAutomationActionProvider automationActionProvider,
+    ICustomAutomationConditionProvider automationConditionProvider,
     IComponentRegistryLocalizationService localizationService) : IComponentRegistryReadService
 {
     /// <inheritdoc/>
@@ -142,6 +152,54 @@ public class ComponentRegistryReadService(
 
         return Task.FromResult(new FormBuilderRegistryReadModel(components, sections));
     }
+
+    /// <inheritdoc/>
+    public Task<AutomationRegistryReadModel> GetAutomationRegistryAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var triggers = automationTriggerProvider.GetAll()
+            .Select(t => new AutomationTriggerDto(
+                t.Identifier,
+                localizationService.LocalizeResourceKey(t.DisplayName),
+                LocalizeResourceKeyOrNull(t.Description),
+                t.IconName,
+                t.TriggerType?.FullName,
+                t.PropertiesType?.FullName,
+                t.TriggerDataType?.FullName,
+                t.ObjectType))
+            .OrderBy(t => t.Identifier, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var actions = automationActionProvider.GetAll()
+            .Select(a => new AutomationStepDto(
+                a.Identifier,
+                localizationService.LocalizeResourceKey(a.DisplayName),
+                LocalizeResourceKeyOrNull(a.Description),
+                a.IconName,
+                a.ActionType?.FullName,
+                a.PropertiesType?.FullName))
+            .OrderBy(a => a.Identifier, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var conditions = automationConditionProvider.GetAll()
+            .Select(c => new AutomationStepDto(
+                c.Identifier,
+                localizationService.LocalizeResourceKey(c.DisplayName),
+                LocalizeResourceKeyOrNull(c.Description),
+                c.IconName,
+                c.ConditionType?.FullName,
+                c.PropertiesType?.FullName))
+            .OrderBy(c => c.Identifier, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult(new AutomationRegistryReadModel(triggers, actions, conditions));
+    }
+
+    private string? LocalizeResourceKeyOrNull(string? value) =>
+        string.IsNullOrWhiteSpace(value)
+            ? value
+            : localizationService.LocalizeResourceKey(value);
 
     private string? LocalizeOrNull(string? value) =>
         string.IsNullOrWhiteSpace(value)

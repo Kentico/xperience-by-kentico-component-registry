@@ -6,6 +6,9 @@ public class ComponentRegistryUsageMcpToolsTests
     [TestCase("page", "section", "page.section", "page-section:page.section")]
     [TestCase("email", "section", "email.section", "email-section:email.section")]
     [TestCase("form", "section", "form.section", "form-section:form.section")]
+    [TestCase("automation", "trigger", "a.trigger", "automation-trigger:a.trigger")]
+    [TestCase("automation", "actions", "a.action", "automation-action:a.action")]
+    [TestCase("automation", "condition", "a.condition", "automation-condition:a.condition")]
     public async Task GetComponentUsage_RoutesSectionQueriesToExpectedUsageMethod(
         string builder,
         string sectionType,

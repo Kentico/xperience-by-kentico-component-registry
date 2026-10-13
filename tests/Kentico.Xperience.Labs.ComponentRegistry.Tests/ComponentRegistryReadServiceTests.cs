@@ -1,3 +1,7 @@
+using CMS.Automation.Internal;
+
+using NSubstitute;
+
 namespace Kentico.Xperience.Labs.ComponentRegistry.Tests;
 
 public class ComponentRegistryReadServiceTests
@@ -87,6 +91,9 @@ public class ComponentRegistryReadServiceTests
             emailTemplateStore ?? new InMemoryStore<EmailBuilderTemplateDefinition>([]),
             formComponentStore ?? new InMemoryStore<FormBuilderComponentDefinition>([]),
             formSectionStore ?? new InMemoryStore<FormBuilderSectionDefinition>([]),
+            Substitute.For<ICustomAutomationTriggerProvider>(),
+            Substitute.For<ICustomAutomationActionProvider>(),
+            Substitute.For<ICustomAutomationConditionProvider>(),
             localizationService ?? new PrefixLocalizationService(string.Empty));
 }
 
@@ -106,4 +113,6 @@ internal sealed class InMemoryStore<TDefinition>(IEnumerable<TDefinition> defini
 internal sealed class PrefixLocalizationService(string prefix) : IComponentRegistryLocalizationService
 {
     public string Localize(string value) => $"{prefix}{value}";
+
+    public string LocalizeResourceKey(string value) => $"{prefix}{value}";
 }

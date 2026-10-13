@@ -34,7 +34,7 @@ builder.Services.AddComponentRegistry();
 
 Run the application and navigate to the "Component Registry" application in the Xperience administration under the "Development" category.
 
-You can control access to Component Registry application and each of the 3 registry pages through Xperience's role and permission management.
+You can control access to Component Registry application and each of the 4 registry sections (Page Builder, Email Builder, Form Builder, Automation Builder) through Xperience's role and permission management.
 
 ### MCP endpoint (optional)
 
@@ -93,6 +93,8 @@ For VS Code, use `.vscode/mcp.json` with `"servers"` instead of `"mcpServers"`.
 - `View Form Builder component usages`: Gives expanded permissions on the registry page, enabling viewing the usages of individual Form Builder components across all forms. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose a list of forms to administration users they normally would not have access to.
 - `View Email Builder components`: Enables viewing the Email Builder component registry page.
 - `View Email Builder component usages`: Gives expanded permissions on the registry page, enabling viewing the usages of individual Email Builder components across all email channels. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose content to administration users they normally would not have access to.
+- `View Automation Builder components`: Enables viewing the Automation Builder registry pages (custom automation triggers, actions, and conditions).
+- `View Automation Builder component usages`: Gives expanded permissions on the registry pages, enabling viewing the automation processes that use individual custom triggers, actions, and conditions, including each step's configured parameters. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose automation processes to administration users they normally would not have access to.
 
 ## MCP Tools Reference
 
@@ -104,8 +106,8 @@ Lists registered component definitions for a specific builder and component type
 
 **Parameters:**
 
-- `builder` (string, required): Builder type - `page`, `email`, or `form`
-- `componentType` (string, optional): Component type filter - `widget`, `section`, `template`, `page-template`, `component`, or `all` (default: `all`)
+- `builder` (string, required): Builder type - `page`, `email`, `form`, or `automation`
+- `componentType` (string, optional): Component type filter - `widget`, `section`, `template`, `page-template`, `component`, `trigger`, `action`, `condition`, or `all` (default: `all`)
 
 **Returns:** `ComponentDefinitionListResponse`
 
@@ -133,15 +135,16 @@ Lists registered component definitions for a specific builder and component type
 
 ### component_registry_get_usage
 
-Gets detailed usage information for a specific component identifier across all pages, emails, or forms.
+Gets detailed usage information for a specific component identifier across all pages, emails, forms, or automation processes.
 
 **Parameters:**
 
-- `builder` (string, required): Builder type - `page`, `email`, or `form`
+- `builder` (string, required): Builder type - `page`, `email`, `form`, or `automation`
 - `componentType` (string, required): Supported combinations:
   - `page`: `widget`, `page-template`
   - `email`: `widget`, `template`
   - `form`: `component`, `section`
+  - `automation`: `trigger`, `action`, `condition`
 - `componentIdentifier` (string, required): The unique identifier of the component
 
 **Returns:** Varies by builder type:
@@ -149,6 +152,7 @@ Gets detailed usage information for a specific component identifier across all p
 - **Page Builder**: `ComponentUsageMcpResponse` - Contains `TotalPagesUsing`, `TotalVariants`, `LastModified`, and list of `Pages` with their `Variants`
 - **Email Builder**: `EmailConfigurationUsageDetailDto` - Contains `TotalEmailConfigurationsUsing`, `TotalVariants`, and list of `EmailConfigurations` with their `Variants`
 - **Form Builder**: `FormComponentUsageDetailDto` - Contains `TotalFormClassesUsing`, `TotalFormBuilderFormsUsing`, and lists of `FormClasses` and `FormBuilderForms`
+- **Automation Builder**: `AutomationStepUsageDetailDto` - Contains `TotalProcessesUsing`, `TotalUsages`, `LastModified`, and list of `Processes` with their step/trigger `Usages` and configured `Parameters`
 
 For Page and Email usage details, each variant includes:
 

@@ -137,3 +137,49 @@ export interface FormComponentUsageDetailDto {
   formClasses: FormClassUsageDto[];
   formBuilderForms: FormBuilderFormUsageDto[];
 }
+
+export interface AutomationStepDto {
+  identifier: string;
+  name: string;
+  description?: string;
+  iconName?: string;
+  implementationTypeName?: string;
+  propertiesTypeName?: string;
+}
+
+export interface AutomationTriggerDto extends AutomationStepDto {
+  triggerDataTypeName?: string;
+  objectType?: string;
+}
+
+export interface AutomationStepParameterDto {
+  name: string;
+  value: string;
+}
+
+export interface AutomationProcessStepUsageDto {
+  objectID: number;
+  name?: string;
+  displayName: string;
+  lastModified?: string;
+  parameters: AutomationStepParameterDto[];
+}
+
+export interface AutomationProcessUsageDto {
+  processID: number;
+  processDisplayName: string;
+  processName: string;
+  isEnabled: boolean;
+  lastModified?: string;
+  adminPath?: string;
+  usages: AutomationProcessStepUsageDto[];
+}
+
+export interface AutomationStepUsageDetailDto {
+  componentIdentifier: string;
+  componentType: string;
+  totalProcessesUsing: number;
+  totalUsages: number;
+  lastModified?: string;
+  processes: AutomationProcessUsageDto[];
+}

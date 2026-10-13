@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <AssemblyAttribute Include="CMS.AssemblyDiscoverableAttribute"></AssemblyAttribute>
+    <InternalsVisibleTo Include="Kentico.Xperience.Labs.ComponentRegistry.Tests" />
   </ItemGroup>
 
   <ItemGroup>

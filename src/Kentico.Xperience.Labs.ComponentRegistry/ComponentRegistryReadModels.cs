@@ -69,6 +69,44 @@ public record FormSectionDto(
     string? MarkedTypeName);
 
 /// <summary>
+/// Data transfer object for custom automation action and condition definitions.
+/// </summary>
+/// <param name="Identifier">Step identifier stored in the automation process step parameters.</param>
+/// <param name="Name">Localized display name.</param>
+/// <param name="Description">Localized description.</param>
+/// <param name="IconName">Admin icon name.</param>
+/// <param name="ImplementationTypeName">Full name of the action or condition implementation type.</param>
+/// <param name="PropertiesTypeName">Full name of the step properties type, if any.</param>
+public record AutomationStepDto(
+    string Identifier,
+    string Name,
+    string? Description,
+    string? IconName,
+    string? ImplementationTypeName,
+    string? PropertiesTypeName);
+
+/// <summary>
+/// Data transfer object for custom automation trigger definitions.
+/// </summary>
+/// <param name="Identifier">Trigger identifier stored in the automation process trigger parameters.</param>
+/// <param name="Name">Localized display name.</param>
+/// <param name="Description">Localized description.</param>
+/// <param name="IconName">Admin icon name.</param>
+/// <param name="ImplementationTypeName">Full name of the trigger implementation type.</param>
+/// <param name="PropertiesTypeName">Full name of the trigger properties type, if any.</param>
+/// <param name="TriggerDataTypeName">Full name of the trigger data type, if any.</param>
+/// <param name="ObjectType">Object type the trigger is bound to.</param>
+public record AutomationTriggerDto(
+    string Identifier,
+    string Name,
+    string? Description,
+    string? IconName,
+    string? ImplementationTypeName,
+    string? PropertiesTypeName,
+    string? TriggerDataTypeName,
+    string? ObjectType);
+
+/// <summary>
 /// Aggregated read model for page builder registry definitions.
 /// </summary>
 public record PageBuilderRegistryReadModel(
@@ -90,3 +128,11 @@ public record EmailBuilderRegistryReadModel(
 public record FormBuilderRegistryReadModel(
     IReadOnlyList<FormComponentDto> FormComponents,
     IReadOnlyList<FormSectionDto> FormSections);
+
+/// <summary>
+/// Aggregated read model for custom automation step definitions.
+/// </summary>
+public record AutomationRegistryReadModel(
+    IReadOnlyList<AutomationTriggerDto> Triggers,
+    IReadOnlyList<AutomationStepDto> Actions,
+    IReadOnlyList<AutomationStepDto> Conditions);

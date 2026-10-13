@@ -75,6 +75,27 @@ public interface IComponentUsageService
     /// <param name="sectionIdentifier">The unique identifier of the form section.</param>
     /// <returns>Form class usage details including all form classes using this section.</returns>
     public Task<FormComponentUsageDetailDto> GetFormBuilderSectionUsageAsync(string sectionIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose triggers use a specific custom automation trigger.
+    /// </summary>
+    /// <param name="triggerIdentifier">The unique identifier of the custom automation trigger.</param>
+    /// <returns>Automation process usage details including each matching trigger.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationTriggerUsageAsync(string triggerIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose steps use a specific custom automation action.
+    /// </summary>
+    /// <param name="actionIdentifier">The unique identifier of the custom automation action.</param>
+    /// <returns>Automation process usage details including each matching step.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationActionUsageAsync(string actionIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose steps use a specific custom automation condition.
+    /// </summary>
+    /// <param name="conditionIdentifier">The unique identifier of the custom automation condition.</param>
+    /// <returns>Automation process usage details including each matching step.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationConditionUsageAsync(string conditionIdentifier);
 }
 
 
@@ -82,9 +103,12 @@ public interface IComponentUsageService
 /// Service for retrieving component usage information from the database.
 /// Uses CMS.DataEngine.ConnectionHelper to query CMS_WebPageItem and CMS_ContentItemCommonData.
 /// </summary>
-public class ComponentUsageService(ILogger<ComponentUsageService> logger) : IComponentUsageService
+public partial class ComponentUsageService(
+    ILogger<ComponentUsageService> logger,
+    IComponentRegistryLocalizationService localizationService) : IComponentUsageService
 {
     private readonly ILogger<ComponentUsageService> logger = logger;
+    private readonly IComponentRegistryLocalizationService localizationService = localizationService;
 
     /// <inheritdoc/>
     public Task<ComponentUsageDetailDto> GetPageBuilderPageTemplateUsageAsync(string templateIdentifier) => GetComponentUsage(
