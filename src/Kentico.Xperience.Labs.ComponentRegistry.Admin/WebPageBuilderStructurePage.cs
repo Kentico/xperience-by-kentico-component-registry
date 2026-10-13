@@ -20,7 +20,7 @@ using Kentico.Xperience.Labs.ComponentRegistry.Admin;
 namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
 
 /// <summary>
-/// "Builder structure (Labs)" tab of a web page: the Page Builder configuration of the latest version of the edited language variant
+/// "Structure (Labs)" tab of a web page: the Page Builder configuration of the latest version of the edited language variant
 /// as nested boxes (page template, editable areas, sections, zones, widgets, widget variants).
 /// Requires <see cref="ComponentRegistryPermissions.VIEW_PAGE_BUILDER"/> in the Component Registry application, on top of the
 /// website channel permissions that already guard <see cref="WebPageLayout"/>.
@@ -65,11 +65,15 @@ internal sealed class WebPageBuilderStructurePage(
 }
 
 /// <summary>
-/// Hides the "Builder structure (Labs)" tab on the website channel root and for users without
+/// Hides the "Structure (Labs)" tab on the website channel root and for users without
 /// <see cref="ComponentRegistryPermissions.VIEW_PAGE_BUILDER"/>. The page itself checks the permission too.
+/// Disables the tab whenever <see cref="WebPageLayout"/> disables the <see cref="PageBuilderTab"/>
+/// (folders, untranslated pages, content-only pages, and content types without Page Builder).
 /// </summary>
 internal sealed class WebPageBuilderStructureNavigationExtender(IComponentRegistryPermissionEvaluator permissionEvaluator) : PageExtender<WebPageLayout>
 {
+    private const string PAGE_BUILDER_TAB_SLUG = "page-builder";
+
     private readonly IComponentRegistryPermissionEvaluator permissionEvaluator = permissionEvaluator;
 
     public override async Task<TemplateClientProperties> ConfigureTemplateProperties(TemplateClientProperties properties)
@@ -81,6 +85,17 @@ internal sealed class WebPageBuilderStructureNavigationExtender(IComponentRegist
         {
             properties.Navigation.Items = [.. properties.Navigation.Items
                 .Where(item => !string.Equals(item.Path, BuilderStructureTab.SLUG, StringComparison.OrdinalIgnoreCase))];
+
+            return properties;
+        }
+
+        var pageBuilderTab = properties.Navigation.Items.FirstOrDefault(item => item.Path == PAGE_BUILDER_TAB_SLUG);
+        var builderStructureTab = properties.Navigation.Items.FirstOrDefault(item => item.Path == BuilderStructureTab.SLUG);
+
+        if (pageBuilderTab is { Disabled: true } && builderStructureTab is not null)
+        {
+            builderStructureTab.Disabled = true;
+            builderStructureTab.InactiveMessage = pageBuilderTab.InactiveMessage;
         }
 
         return properties;

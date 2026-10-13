@@ -56,6 +56,9 @@ export interface BuilderStructureClientProperties {
   readonly structure?: BuilderStructureDto | null;
 }
 
+/** `simple` shows only the structure and identifiers, `detailed` all metadata. */
+export type BuilderDisplayMode = 'simple' | 'detailed';
+
 /** Wording that differs between Page Builder and Email Builder. */
 export interface BuilderLabels {
   readonly builderName: string;
