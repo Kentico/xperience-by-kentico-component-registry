@@ -15,6 +15,7 @@ import {
   TableRow,
 } from './ui/table';
 import { Input } from './ui/input';
+import { IconTableCell, IconTableHead } from './ui/icon-table-cell';
 import { ChevronDown, Loader } from 'lucide-react';
 import { usePageCommand } from '@kentico/xperience-admin-base';
 import { ComponentDetailsPanel } from './ComponentDetails';
@@ -115,21 +116,13 @@ const ComponentTableRow: React.FC<{
             {component.identifier}
           </code>
         </TableCell>
+        <IconTableCell iconClass={component.iconClass} />
         <TableCell className="font-semibold xp-text-default">
           {component.name}
         </TableCell>
         <TableCell className="xp-text-muted max-w-md">
           {component.description || (
             <span className="xp-muted-dash italic">No description</span>
-          )}
-        </TableCell>
-        <TableCell>
-          {component.iconClass ? (
-            <code className="xp-code-chip">
-              {component.iconClass}
-            </code>
-          ) : (
-            <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
         <TableCell>
@@ -247,14 +240,12 @@ export const PageBuilderComponentViewerTemplate = (
                               <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
+                              <IconTableHead />
                               <TableHead className="font-semibold">
                                 Name
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Icon
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Component Type
@@ -320,14 +311,12 @@ export const PageBuilderComponentViewerTemplate = (
                               <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
+                              <IconTableHead />
                               <TableHead className="font-semibold">
                                 Name
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Icon
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Component Type
@@ -393,14 +382,12 @@ export const PageBuilderComponentViewerTemplate = (
                               <TableHead className="font-semibold">
                                 Identifier
                               </TableHead>
+                              <IconTableHead />
                               <TableHead className="font-semibold">
                                 Name
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Icon
                               </TableHead>
                               <TableHead className="font-semibold">
                                 Component Type
