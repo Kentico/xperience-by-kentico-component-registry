@@ -209,6 +209,7 @@ public static class ServiceCollectionComponentRegistryExtensions
         services.AddScoped<IComponentUsageService, ComponentUsageService>();
         services.AddScoped<IComponentRegistryLocalizationService, ComponentRegistryLocalizationService>();
         services.AddScoped<IComponentRegistryReadService, ComponentRegistryReadService>();
+        services.AddScoped<IBuilderStructureService, BuilderStructureService>();
 
         return services;
     }

@@ -15,6 +15,8 @@
 
 This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets or custom automation steps, and explore which channels, web pages, forms, emails, and automation processes use those components all through a friendly user interface in the Xperience administration.
 
+A **Builder structure** tab on web pages and Email Builder emails visualizes the Page Builder or Email Builder configuration (template, editable areas, sections, zones, widgets, and personalized variants) and flags components that are no longer registered.
+
 It optionally exposes the entire component registry over an in-application hosted MCP server, giving agents the ability to identify where components are used across channels, and even visit Page Builder pages using components to visually validate their configuration and design.
 
 Interested in how and why this library was created? Read the blog post [Dream and Experiment: Building a Component Registry Dashboard with AI](https://community.kentico.com/blog/dream-and-experiment-building-a-component-registry-dashboard-with-ai).
