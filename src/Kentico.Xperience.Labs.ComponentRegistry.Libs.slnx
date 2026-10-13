@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Kentico.Xperience.Labs.ComponentRegistry.MCP/Kentico.Xperience.Labs.ComponentRegistry.MCP.csproj" />
+  <Project Path="Kentico.Xperience.Labs.ComponentRegistry.Admin/Kentico.Xperience.Labs.ComponentRegistry.Admin.csproj" />
+  <Project Path="Kentico.Xperience.Labs.ComponentRegistry/Kentico.Xperience.Labs.ComponentRegistry.csproj" />
+</Solution>

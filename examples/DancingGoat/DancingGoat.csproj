@@ -22,9 +22,9 @@
     <DefineConstants>$(DefineConstants);SEPARATED_ADMIN</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Kentico.Xperience.ComponentRegistry\Kentico.Xperience.ComponentRegistry.csproj" />
-    <ProjectReference Include="..\..\src\Kentico.Xperience.ComponentRegistry.Admin\Kentico.Xperience.ComponentRegistry.Admin.csproj" Condition="'$(SeparatedAdmin)' == 'false'" />
-    <ProjectReference Include="..\..\src\Kentico.Xperience.ComponentRegistry.MCP\Kentico.Xperience.ComponentRegistry.MCP.csproj" />
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.ComponentRegistry\Kentico.Xperience.Labs.ComponentRegistry.csproj" />
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.ComponentRegistry.Admin\Kentico.Xperience.Labs.ComponentRegistry.Admin.csproj" Condition="'$(SeparatedAdmin)' == 'false'" />
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.ComponentRegistry.MCP\Kentico.Xperience.Labs.ComponentRegistry.MCP.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="kentico.xperience.admin" Condition="'$(SeparatedAdmin)' == 'false'" />

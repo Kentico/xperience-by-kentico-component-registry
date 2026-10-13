@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit" />
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="NUnit3TestAdapter" />
+    <PackageReference Include="NSubstitute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="NUnit.Framework" />
+    <Using Include="Kentico.Xperience.Labs.ComponentRegistry.MCP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.ComponentRegistry\Kentico.Xperience.Labs.ComponentRegistry.csproj" />
+    <ProjectReference Include="..\..\src\Kentico.Xperience.Labs.ComponentRegistry.MCP\Kentico.Xperience.Labs.ComponentRegistry.MCP.csproj" />
+  </ItemGroup>
+
+</Project>

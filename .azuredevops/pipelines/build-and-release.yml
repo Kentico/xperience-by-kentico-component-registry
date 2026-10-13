@@ -31,7 +31,7 @@ stages:
             value: true
 
           - name: slnPath
-            value: src/Kentico.Xperience.ComponentRegistry.Libs.slnx
+            value: src/Kentico.Xperience.Labs.ComponentRegistry.Libs.slnx
 
         steps:
           - task: UseDotNet@2
@@ -43,7 +43,7 @@ stages:
             inputs:
               targetType: inline
               script: |
-                $fileContent = Get-Content -Path 'src/Kentico.Xperience.ComponentRegistry.Admin/Client/package.json' -Raw
+                $fileContent = Get-Content -Path 'src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client/package.json' -Raw
                 $jsonObject = ConvertFrom-Json -InputObject $fileContent
 
                 # Get the value of engines.node
@@ -96,14 +96,14 @@ stages:
               Configuration: $(Configuration)
               artifacts:
                 - Core:
-                  artifactName: "Kentico-Xperience-ComponentRegistry"
-                  projectPath: "src/Kentico.Xperience.ComponentRegistry"
+                  artifactName: "Kentico-Xperience-Labs-ComponentRegistry"
+                  projectPath: "src/Kentico.Xperience.Labs.ComponentRegistry"
                 - Admin:
-                  artifactName: "Kentico-Xperience-ComponentRegistry-Admin"
-                  projectPath: "src/Kentico.Xperience.ComponentRegistry.Admin"
+                  artifactName: "Kentico-Xperience-Labs-ComponentRegistry-Admin"
+                  projectPath: "src/Kentico.Xperience.Labs.ComponentRegistry.Admin"
                 - MCP:
-                  artifactName: "Kentico-Xperience-ComponentRegistry-MCP"
-                  projectPath: "src/Kentico.Xperience.ComponentRegistry.MCP"
+                  artifactName: "Kentico-Xperience-Labs-ComponentRegistry-MCP"
+                  projectPath: "src/Kentico.Xperience.Labs.ComponentRegistry.MCP"
 
   - ${{ if eq(variables['Build.SourceBranch'], 'refs/heads/main') }}:
       - stage: PublishNuGetPackages

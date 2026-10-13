@@ -38,6 +38,6 @@
   "files.associations": {
     ".azuredevops/**/*.yml": "azure-pipelines"
   },
-  "dotnet.defaultSolution": "Kentico.Xperience.ComponentRegistry.slnx",
-  "dotnet.solution.autoOpen": "Kentico.Xperience.ComponentRegistry.slnx"
+  "dotnet.defaultSolution": "Kentico.Xperience.Labs.ComponentRegistry.slnx",
+  "dotnet.solution.autoOpen": "Kentico.Xperience.Labs.ComponentRegistry.slnx"
 }

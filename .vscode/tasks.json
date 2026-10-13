@@ -4,7 +4,7 @@
 		{
 			"type": "npm",
 			"script": "install",
-			"path": "src/Kentico.Xperience.ComponentRegistry.Admin/Client",
+			"path": "src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client",
 			"group": "build",
 			"problemMatcher": [],
 			"label": "npm: install - Admin/Client",
@@ -24,7 +24,7 @@
 			"command": "dotnet",
 			"args": [
 				"format",
-				"Kentico.Xperience.ComponentRegistry.slnx",
+				"Kentico.Xperience.Labs.ComponentRegistry.slnx",
 				"--exclude",
 				"./examples/**"
 			],
@@ -46,7 +46,7 @@
 		{
 			"type": "npm",
 			"script": "build",
-			"path": "src/Kentico.Xperience.ComponentRegistry.Admin/Client",
+			"path": "src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client",
 			"group": "build",
 			"problemMatcher": [],
 			"label": "npm: build - Admin/Client",
@@ -55,7 +55,7 @@
 		{
 			"type": "npm",
 			"script": "build:dev",
-			"path": "src/Kentico.Xperience.ComponentRegistry.Admin/Client",
+			"path": "src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client",
 			"group": "build",
 			"problemMatcher": [],
 			"label": "npm: build:dev - Admin/Client",
@@ -64,7 +64,7 @@
 		{
 			"type": "npm",
 			"script": "start",
-			"path": "src/Kentico.Xperience.ComponentRegistry.Admin/Client",
+			"path": "src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client",
 			"problemMatcher": [],
 			"label": "npm: watch Admin/Client",
 			"detail": "webpack serve --mode development"
@@ -92,7 +92,7 @@
 			"command": "dotnet",
 			"args": [
 				"test",
-				"Kentico.Xperience.ComponentRegistry.slnx"
+				"Kentico.Xperience.Labs.ComponentRegistry.slnx"
 			],
 			"isBackground": false,
 			"group": "test"

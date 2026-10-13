@@ -6,7 +6,7 @@ This project implements a company website of a fictional coffee shop franchise t
 
 Follow the instructions in the [Installation](https://docs.xperience.io/x/DQKQC) documentation to troubleshoot any installation or configuration issues.
 
-This sample is generated from `Kentico.Xperience.Templates` version `31.9.2` and references the Component Registry library, administration module, and MCP tools from this repository. Package versions are managed centrally in the repository root `Directory.Packages.props`.
+This sample is generated from `Kentico.Xperience.Templates` version `31.9.2` and references the Xperience by Kentico Labs: Component Registry library (`Kentico.Xperience.Labs.ComponentRegistry`), administration module, and MCP tools from this repository. Package versions are managed centrally in the repository root `Directory.Packages.props`.
 
 See [Contributing Setup](../../docs/Contributing-Setup.md) for database and Management API secret configuration. The local site runs at `http://localhost:18319`, with Component Registry MCP tools at `/mcp`.
 

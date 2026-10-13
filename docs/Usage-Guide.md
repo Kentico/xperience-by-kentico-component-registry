@@ -1,28 +1,23 @@
 # Usage Guide
 
-> [!WARNING]
-> These package IDs are deprecated and 2.0.0 is the final release under them. Future releases ship as `Kentico.Xperience.Labs.ComponentRegistry`, `Kentico.Xperience.Labs.ComponentRegistry.Admin`, and `Kentico.Xperience.Labs.ComponentRegistry.MCP` (namespace `Kentico.Xperience.Labs.ComponentRegistry`). See [releases](https://github.com/Kentico/xperience-by-kentico-component-registry/releases).
->
-> Run `dotnet list package --deprecated` to find old references. Suppress warning `KXCR0001` until you migrate, if needed.
-
 ## Setup
 
 Add the "Admin" package to your ASP.NET Core application using the .NET CLI. This includes the custom admin UI application and all required services.
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry.Admin
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry.Admin
 ```
 
 If you wish to separately install just the registry services, you can use the following:
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry
 ```
 
 If you want to expose MCP tools, add:
 
 ```powershell
-dotnet add package Kentico.Xperience.ComponentRegistry.MCP
+dotnet add package Kentico.Xperience.Labs.ComponentRegistry.MCP
 ```
 
 ## Quick Start
@@ -247,14 +242,14 @@ This enables AI agents to autonomously discover, analyze, and validate component
 
 You can inject `IComponentDefinitionStore<TDefinition>` into your own code to access all the component registrations where `TDefinition` is one of the following types:
 
-- `Kentico.Xperience.ComponentRegistry.PageBuilderWidgetDefinition`
-- `Kentico.Xperience.ComponentRegistry.PageBuilderSectionDefinition`
-- `Kentico.Xperience.ComponentRegistry.PageBuilderPageTemplateDefinition`
-- `Kentico.Xperience.ComponentRegistry.EmailBuilderWidgetDefinition`
-- `Kentico.Xperience.ComponentRegistry.EmailBuilderSectionDefinition`
-- `Kentico.Xperience.ComponentRegistry.EmailBuilderTemplateDefinition`
-- `Kentico.Xperience.ComponentRegistry.FormBuilderComponentDefinition`
-- `Kentico.Xperience.ComponentRegistry.FormBuilderSectionDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.PageBuilderWidgetDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.PageBuilderSectionDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.PageBuilderPageTemplateDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.EmailBuilderWidgetDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.EmailBuilderSectionDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.EmailBuilderTemplateDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.FormBuilderComponentDefinition`
+- `Kentico.Xperience.Labs.ComponentRegistry.FormBuilderSectionDefinition`
 
 Each type has its own Store service.
 
