@@ -1199,7 +1199,7 @@
       "kentico.xperience.labs.componentregistry.mcp": {
         "type": "Project",
         "dependencies": {
-          "Kentico.Xperience.Labs.ComponentRegistry": "[3.0.0, )",
+          "Kentico.Xperience.Labs.ComponentRegistry": "[3.0.0-prerelease-1, )",
           "ModelContextProtocol": "[2.2.0, )",
           "ModelContextProtocol.AspNetCore": "[2.2.0, )"
         }
