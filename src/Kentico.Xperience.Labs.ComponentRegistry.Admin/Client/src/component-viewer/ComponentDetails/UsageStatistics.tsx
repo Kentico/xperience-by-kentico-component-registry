@@ -3,14 +3,12 @@ import React from 'react';
 interface UsageStatisticsProps {
   totalPages: number;
   totalVariants: number;
-  lastModified?: Date;
   label?: string;
 }
 
 export const UsageStatistics: React.FC<UsageStatisticsProps> = ({
   totalPages,
   totalVariants,
-  lastModified,
   label = 'Pages Using Component',
 }) => {
   return (
@@ -29,13 +27,6 @@ export const UsageStatistics: React.FC<UsageStatisticsProps> = ({
           </div>
           <p className="text-xs text-slate-600">Language Variants</p>
         </div>
-        {lastModified && (
-          <div className="pt-2 border-t border-slate-200">
-            <p className="text-xs text-slate-600">
-              Last Modified: {lastModified.toLocaleString()}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -25,25 +25,98 @@ import {
   FormSectionDto,
 } from './ComponentDetails';
 
+type FormBuilderComponentKind = 'component' | 'section';
+
 interface FormBuilderComponentViewerClientProperties {
-  formComponents: FormComponentDto[];
-  formSections: FormSectionDto[];
-  canViewFormBuilderUsages: boolean;
-  componentView: string;
+  components: (FormComponentDto | FormSectionDto)[];
+  componentKind: FormBuilderComponentKind;
+  canViewUsages: boolean;
 }
+
+const viewConfig: Record<
+  FormBuilderComponentKind,
+  { title: string; description: string; emptyText: string }
+> = {
+  component: {
+    title: 'Form Component Types',
+    description: 'Reusable components for building forms',
+    emptyText: 'No form components registered',
+  },
+  section: {
+    title: 'Form Section Types',
+    description: 'Layout sections for organizing form components',
+    emptyText: 'No form sections registered',
+  },
+};
+
+const formatDate = (value: string) => new Date(value).toLocaleString();
+
+interface CombinedFormUsage {
+  key: string;
+  displayName: string;
+  codeName: string;
+  tableName?: string;
+  adminPath?: string;
+  formLastModified?: string;
+  classLastModified?: string;
+}
+
+const combineForms = (
+  usageData: FormComponentUsageDetailDto,
+): CombinedFormUsage[] => {
+  const normalizeFormKey = (value: string) =>
+    value
+      .replace(/^BizForm\./i, '')
+      .trim()
+      .toLowerCase();
+
+  const formsByKey = new Map<string, CombinedFormUsage>();
+
+  usageData.formClasses.forEach((formClass) => {
+    const codeName = formClass.className || formClass.classDisplayName;
+    const key = normalizeFormKey(codeName);
+
+    formsByKey.set(key, {
+      key,
+      displayName: formClass.classDisplayName,
+      codeName,
+      tableName: formClass.classTableName,
+      classLastModified: formClass.classLastModified,
+    });
+  });
+
+  usageData.formBuilderForms.forEach((form) => {
+    const codeName = form.formName || form.formDisplayName;
+    const key = normalizeFormKey(codeName);
+    const existing = formsByKey.get(key);
+
+    formsByKey.set(key, {
+      key,
+      displayName: existing?.displayName || form.formDisplayName,
+      codeName: existing?.codeName || codeName,
+      tableName: existing?.tableName,
+      adminPath: form.adminPath || existing?.adminPath,
+      formLastModified: form.formLastModified,
+      classLastModified: existing?.classLastModified,
+    });
+  });
+
+  return Array.from(formsByKey.values()).sort((a, b) =>
+    a.displayName.localeCompare(b.displayName),
+  );
+};
 
 // Table row component for form builder components
 const FormComponentTableRow: React.FC<{
   component: FormComponentDto | FormSectionDto;
-  componentType: 'component' | 'section';
-  canViewFormBuilderUsages: boolean;
-}> = ({ component, componentType, canViewFormBuilderUsages }) => {
+  canViewUsages: boolean;
+}> = ({ component, canViewUsages }) => {
   const [expanded, setExpanded] = useState(false);
   const [usageData, setUsageData] =
     useState<FormComponentUsageDetailDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { execute: getFormBuilderComponentUsage } = usePageCommand<
+  const { execute: getComponentUsage } = usePageCommand<
     FormComponentUsageDetailDto,
     { componentIdentifier: string }
   >('GetFormBuilderComponentUsage', {
@@ -53,87 +126,22 @@ const FormComponentTableRow: React.FC<{
     },
   });
 
-  const { execute: getFormBuilderSectionUsage } = usePageCommand<
-    FormComponentUsageDetailDto,
-    { componentIdentifier: string }
-  >('GetFormBuilderSectionUsage', {
-    after: (response) => {
-      if (response) setUsageData(response);
-      setIsLoading(false);
-    },
-  });
-
   const handleExpandClick = async () => {
     if (!expanded && !usageData) {
-      if (!canViewFormBuilderUsages) {
+      if (!canViewUsages) {
         return;
       }
       setIsLoading(true);
       try {
-        const params = { componentIdentifier: component.identifier };
-        if (componentType === 'section') {
-          await getFormBuilderSectionUsage(params);
-        } else {
-          await getFormBuilderComponentUsage(params);
-        }
+        await getComponentUsage({ componentIdentifier: component.identifier });
       } catch {
         setIsLoading(false);
-        // Handle error silently
       }
     }
     setExpanded(!expanded);
   };
 
-  const combinedForms = usageData
-    ? (() => {
-        const normalizeFormKey = (value: string) =>
-          value
-            .replace(/^BizForm\./i, '')
-            .trim()
-            .toLowerCase();
-
-        const formsByKey = new Map<
-          string,
-          {
-            key: string;
-            displayName: string;
-            codeName: string;
-            tableName?: string;
-            adminPath?: string;
-          }
-        >();
-
-        usageData.formClasses.forEach((formClass) => {
-          const codeName = formClass.className || formClass.classDisplayName;
-          const key = normalizeFormKey(codeName);
-
-          formsByKey.set(key, {
-            key,
-            displayName: formClass.classDisplayName,
-            codeName,
-            tableName: formClass.classTableName,
-          });
-        });
-
-        usageData.formBuilderForms.forEach((form) => {
-          const codeName = form.formName || form.formDisplayName;
-          const key = normalizeFormKey(codeName);
-          const existing = formsByKey.get(key);
-
-          formsByKey.set(key, {
-            key,
-            displayName: existing?.displayName || form.formDisplayName,
-            codeName: existing?.codeName || codeName,
-            tableName: existing?.tableName,
-            adminPath: form.adminPath || existing?.adminPath,
-          });
-        });
-
-        return Array.from(formsByKey.values()).sort((a, b) =>
-          a.displayName.localeCompare(b.displayName),
-        );
-      })()
-    : [];
+  const combinedForms = usageData ? combineForms(usageData) : [];
 
   return (
     <>
@@ -141,9 +149,9 @@ const FormComponentTableRow: React.FC<{
         <TableCell className="w-10">
           <button
             onClick={handleExpandClick}
-            disabled={isLoading || !canViewFormBuilderUsages}
+            disabled={isLoading || !canViewUsages}
             title={
-              !canViewFormBuilderUsages
+              !canViewUsages
                 ? 'Permission required to view component usages'
                 : ''
             }
@@ -162,9 +170,7 @@ const FormComponentTableRow: React.FC<{
           </button>
         </TableCell>
         <TableCell>
-          <code className="xp-code-chip">
-            {component.identifier}
-          </code>
+          <code className="xp-code-chip">{component.identifier}</code>
         </TableCell>
         <IconTableCell iconClass={component.iconClass} />
         <TableCell className="font-semibold xp-text-default">
@@ -212,7 +218,9 @@ const FormComponentTableRow: React.FC<{
                     </div>
                     <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
                       <dt className="font-medium xp-text-muted">Name</dt>
-                      <dd className="xp-text-muted break-words">{component.name}</dd>
+                      <dd className="xp-text-muted break-words">
+                        {component.name}
+                      </dd>
                     </div>
                     {component.description && (
                       <div className="grid gap-1 sm:grid-cols-[11rem_1fr] sm:gap-4 sm:items-start">
@@ -258,18 +266,6 @@ const FormComponentTableRow: React.FC<{
                                 {combinedForms.length}
                               </div>
                             </div>
-                            <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
-                              <div className="text-xs xp-text-muted font-medium">
-                                Last Updated
-                              </div>
-                              <div className="text-sm xp-text-muted">
-                                {usageData.lastModified
-                                  ? new Date(
-                                      usageData.lastModified,
-                                    ).toLocaleDateString()
-                                  : 'N/A'}
-                              </div>
-                            </div>
                           </div>
 
                           {combinedForms.length > 0 ? (
@@ -293,6 +289,18 @@ const FormComponentTableRow: React.FC<{
                                       {form.tableName && (
                                         <div className="xp-empty-text text-xs mt-1">
                                           Table: {form.tableName}
+                                        </div>
+                                      )}
+                                      {form.formLastModified && (
+                                        <div className="xp-text-muted text-xs mt-1">
+                                          Form updated:{' '}
+                                          {formatDate(form.formLastModified)}
+                                        </div>
+                                      )}
+                                      {form.classLastModified && (
+                                        <div className="xp-text-muted text-xs mt-1">
+                                          Form class updated:{' '}
+                                          {formatDate(form.classLastModified)}
                                         </div>
                                       )}
                                     </div>
@@ -336,164 +344,82 @@ const FormComponentTableRow: React.FC<{
 export const FormBuilderComponentViewerTemplate = (
   props: FormBuilderComponentViewerClientProperties,
 ) => {
-  const [componentFilter, setComponentFilter] = useState('');
-  const [sectionFilter, setSectionFilter] = useState('');
+  const [filter, setFilter] = useState('');
 
-  const filteredFormComponents = props.formComponents.filter((component) =>
-    component.identifier
-      .toLowerCase()
-      .includes(componentFilter.trim().toLowerCase()),
-  );
-  const filteredFormSections = props.formSections.filter((section) =>
-    section.identifier
-      .toLowerCase()
-      .includes(sectionFilter.trim().toLowerCase()),
+  const config = viewConfig[props.componentKind];
+  if (!config) {
+    return null;
+  }
+
+  const components = props.components;
+
+  const normalizedFilter = filter.trim().toLowerCase();
+  const filteredComponents = components.filter((component) =>
+    component.identifier.toLowerCase().includes(normalizedFilter),
   );
 
   return (
     <div className="min-h-screen mr-4">
       <div className="w-full max-w-[110rem] mx-auto">
-        {props.componentView === 'components' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Form Component Types
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Reusable components for building forms
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {props.formComponents.length > 0 ? (
-                  <>
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Filter by identifier..."
-                        value={componentFilter}
-                        onChange={(e) => setComponentFilter(e.target.value)}
-                      />
-                    </div>
-                    {filteredFormComponents.length > 0 ? (
-                      <div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold">
-                                Identifier
-                              </TableHead>
-                              <IconTableHead />
-                              <TableHead className="font-semibold">
-                                Name
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Component Type
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredFormComponents.map((component) => (
-                              <FormComponentTableRow
-                                key={component.identifier}
-                                component={component}
-                                componentType="component"
-                                canViewFormBuilderUsages={
-                                  props.canViewFormBuilderUsages
-                                }
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 xp-empty-text">
-                        <p>No components match this identifier filter</p>
-                      </div>
-                    )}
-                  </>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">{config.title}</CardTitle>
+            <CardDescription className="text-base">
+              {config.description}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {components.length > 0 ? (
+              <>
+                <div className="mb-4">
+                  <Input
+                    type="text"
+                    placeholder="Filter by identifier..."
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                  />
+                </div>
+                {filteredComponents.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10"></TableHead>
+                        <TableHead className="font-semibold">
+                          Identifier
+                        </TableHead>
+                        <IconTableHead />
+                        <TableHead className="font-semibold">Name</TableHead>
+                        <TableHead className="font-semibold">
+                          Description
+                        </TableHead>
+                        <TableHead className="font-semibold">
+                          Component Type
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredComponents.map((component) => (
+                        <FormComponentTableRow
+                          key={component.identifier}
+                          component={component}
+                          canViewUsages={props.canViewUsages}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : (
-                  <div className="text-center py-12 xp-empty-text">
-                    <p className="text-lg">No form components registered</p>
+                  <div className="text-center py-8 xp-empty-text">
+                    <p>No components match this identifier filter</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-        )}
-
-        {props.componentView === 'sections' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Form Section Types
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Layout sections for organizing form components
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {props.formSections.length > 0 ? (
-                  <>
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Filter by identifier..."
-                        value={sectionFilter}
-                        onChange={(e) => setSectionFilter(e.target.value)}
-                      />
-                    </div>
-                    {filteredFormSections.length > 0 ? (
-                      <div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold">
-                                Identifier
-                              </TableHead>
-                              <IconTableHead />
-                              <TableHead className="font-semibold">
-                                Name
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Component Type
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredFormSections.map((section) => (
-                              <FormComponentTableRow
-                                key={section.identifier}
-                                component={section}
-                                componentType="section"
-                                canViewFormBuilderUsages={
-                                  props.canViewFormBuilderUsages
-                                }
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 xp-empty-text">
-                        <p>No components match this identifier filter</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-12 xp-empty-text">
-                    <p className="text-lg">No form sections registered</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-        )}
+              </>
+            ) : (
+              <div className="text-center py-12 xp-empty-text">
+                <p className="text-lg">{config.emptyText}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

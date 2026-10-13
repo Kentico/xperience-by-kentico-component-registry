@@ -18,17 +18,17 @@ export const LanguageVariantItem: React.FC<LanguageVariantItemProps> = ({
 }) => {
   const [expanded, setExpanded] = useState(false);
 
-  const lastModified = variant.lastModified
-    ? new Date(variant.lastModified).toLocaleDateString()
-    : 'Unknown';
-
+  const isEmailVariant = variant.configurationType?.startsWith('Email');
   const statusColor = variant.isPublished
     ? 'text-green-600 bg-green-50'
     : 'text-slate-500 bg-slate-50';
   const statusLabel = variant.isPublished ? 'Published' : 'Draft';
-  const adminLinkTitle = variant.configurationType?.startsWith('Email')
+  const adminLinkTitle = isEmailVariant
     ? 'Open email in Email Builder'
     : 'Open page in Page Builder';
+  const lastPublishedLabel = isEmailVariant
+    ? 'Email variant last published'
+    : 'Page variant last published';
   const normalizedComponentType = inspectedComponentType.toLowerCase();
   const enableComponentHighlight =
     normalizedComponentType.includes('widget') ||
@@ -51,7 +51,12 @@ export const LanguageVariantItem: React.FC<LanguageVariantItemProps> = ({
             <p className="text-sm font-medium text-slate-900">
               {variant.languageName}
             </p>
-            <p className="text-xs text-slate-600">Modified: {lastModified}</p>
+            {variant.lastModified && (
+              <p className="text-xs text-slate-600">
+                {lastPublishedLabel}:{' '}
+                {new Date(variant.lastModified).toLocaleString()}
+              </p>
+            )}
           </div>
           <span
             className={`text-xs font-medium px-2 py-1 rounded ${statusColor}`}

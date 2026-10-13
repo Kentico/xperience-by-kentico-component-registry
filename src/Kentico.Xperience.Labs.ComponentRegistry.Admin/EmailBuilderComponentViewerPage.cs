@@ -18,21 +18,21 @@ using InternalEmailBuilderTab = Kentico.Xperience.Admin.DigitalMarketing.UIPages
     parentType: typeof(EmailBuilderComponentViewerPage),
     slug: "widgets",
     name: "Widgets",
-    templateName: "@kentico/xperience-labs-component-registry-admin/EmailBuilderComponentViewer",
+    templateName: EmailBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 1)]
 [assembly: UIPage(
     uiPageType: typeof(EmailBuilderSectionsPage),
     parentType: typeof(EmailBuilderComponentViewerPage),
     slug: "sections",
     name: "Sections",
-    templateName: "@kentico/xperience-labs-component-registry-admin/EmailBuilderComponentViewer",
+    templateName: EmailBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 2)]
 [assembly: UIPage(
     uiPageType: typeof(EmailBuilderTemplatesPage),
     parentType: typeof(EmailBuilderComponentViewerPage),
     slug: "email-templates",
     name: "Email Templates",
-    templateName: "@kentico/xperience-labs-component-registry-admin/EmailBuilderComponentViewer",
+    templateName: EmailBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 3)]
 
 namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
@@ -42,63 +42,59 @@ namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
 /// </summary>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_EMAIL_BUILDER)]
 [UINavigation(true)]
-public class EmailBuilderComponentViewerPage : SecondaryMenuSectionPage;
+public class EmailBuilderComponentViewerPage : SecondaryMenuSectionPage
+{
+    public const string TEMPLATE_NAME = "@kentico/xperience-labs-component-registry-admin/EmailBuilderComponentViewer";
+}
 
 /// <summary>
-/// Base page for displaying registered Email Builder components of a single type.
+/// Base page for displaying registered Email Builder components of a single kind.
+/// Each page sends only its own component definitions to the client.
 /// </summary>
+/// <typeparam name="TComponent">Component definition DTO sent to the client.</typeparam>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_EMAIL_BUILDER)]
-public abstract class EmailBuilderComponentListingPage(
+public abstract class EmailBuilderComponentListingPage<TComponent>(
     IPageLinkGenerator pageLinkGenerator,
     IComponentRegistryReadService componentRegistryReadService,
-    IComponentUsageService componentUsageService,
-    IUIPermissionEvaluator permissionEvaluator) : Page<EmailBuilderComponentViewerPageClientProperties>
+    IUIPermissionEvaluator permissionEvaluator) : Page<EmailBuilderComponentViewerPageClientProperties<TComponent>>
 {
-    protected abstract string ComponentView { get; }
+    /// <summary>
+    /// Component kind sent to the client: <c>widget</c>, <c>section</c> or <c>template</c>.
+    /// </summary>
+    protected abstract string ComponentKind { get; }
 
-    public override async Task<EmailBuilderComponentViewerPageClientProperties> ConfigureTemplateProperties(
-        EmailBuilderComponentViewerPageClientProperties properties)
+    protected abstract IReadOnlyList<TComponent> GetComponents(EmailBuilderRegistryReadModel model);
+
+    protected abstract Task<EmailConfigurationUsageDetailDto> GetUsage(string identifier);
+
+    public override async Task<EmailBuilderComponentViewerPageClientProperties<TComponent>> ConfigureTemplateProperties(
+        EmailBuilderComponentViewerPageClientProperties<TComponent> properties)
     {
-        properties.ComponentView = ComponentView;
-
         var model = await componentRegistryReadService.GetEmailBuilderRegistryAsync();
 
-        properties.Widgets = model.Widgets;
-        properties.Sections = model.Sections;
-        properties.EmailTemplates = model.EmailTemplates;
+        properties.ComponentKind = ComponentKind;
+        properties.Components = GetComponents(model);
 
-        // Evaluate permissions and propagate to client
-        var canViewEmailBuilderUsages = await permissionEvaluator.Evaluate(
+        var canViewUsages = await permissionEvaluator.Evaluate(
             ComponentRegistryPermissions.VIEW_EMAIL_BUILDER_USAGES);
-        properties.CanViewEmailBuilderUsages = canViewEmailBuilderUsages.Succeeded;
+        properties.CanViewUsages = canViewUsages.Succeeded;
 
         return properties;
     }
 
     /// <summary>
-    /// Retrieves detailed usage information for an email builder widget component.
+    /// Retrieves detailed usage information for an Email Builder component of this page's kind.
     /// </summary>
-    [PageCommand(CommandName = "GetEmailBuilderWidgetUsage", Permission = ComponentRegistryPermissions.VIEW_EMAIL_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetEmailBuilderWidgetUsage(ComponentDetailsParams @params)
+    [PageCommand(CommandName = "GetEmailBuilderComponentUsage", Permission = ComponentRegistryPermissions.VIEW_EMAIL_BUILDER_USAGES)]
+    public async Task<ICommandResponse> GetEmailBuilderComponentUsage(ComponentDetailsParams @params)
     {
-        var usage = await componentUsageService.GetEmailBuilderWidgetUsageAsync(@params.ComponentIdentifier);
-        AddAdminPaths(usage);
-        return ResponseFrom(usage);
-    }
+        if (@params?.ComponentIdentifier is null)
+        {
+            return ResponseFrom("Component identifier is required");
+        }
 
-    /// <summary>
-    /// Retrieves detailed usage information for an email builder template component.
-    /// </summary>
-    [PageCommand(CommandName = "GetEmailBuilderTemplateUsage", Permission = ComponentRegistryPermissions.VIEW_EMAIL_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetEmailBuilderTemplateUsage(ComponentDetailsParams @params)
-    {
-        var usage = await componentUsageService.GetEmailBuilderTemplateUsageAsync(@params.ComponentIdentifier);
-        AddAdminPaths(usage);
-        return ResponseFrom(usage);
-    }
+        var usage = await GetUsage(@params.ComponentIdentifier);
 
-    private void AddAdminPaths(EmailConfigurationUsageDetailDto usage)
-    {
         foreach (var configuration in usage.EmailConfigurations)
         {
             foreach (var variant in configuration.Variants)
@@ -116,6 +112,8 @@ public abstract class EmailBuilderComponentListingPage(
                     : adminPath;
             }
         }
+
+        return ResponseFrom(usage);
     }
 }
 
@@ -125,9 +123,14 @@ public class EmailBuilderWidgetsPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : EmailBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : EmailBuilderComponentListingPage<EmailComponentDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "widgets";
+    protected override string ComponentKind => "widget";
+
+    protected override IReadOnlyList<EmailComponentDto> GetComponents(EmailBuilderRegistryReadModel model) => model.Widgets;
+
+    protected override Task<EmailConfigurationUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetEmailBuilderWidgetUsageAsync(identifier);
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_EMAIL_BUILDER)]
@@ -136,9 +139,14 @@ public class EmailBuilderSectionsPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : EmailBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : EmailBuilderComponentListingPage<EmailComponentDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "sections";
+    protected override string ComponentKind => "section";
+
+    protected override IReadOnlyList<EmailComponentDto> GetComponents(EmailBuilderRegistryReadModel model) => model.Sections;
+
+    protected override Task<EmailConfigurationUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetEmailBuilderSectionUsageAsync(identifier);
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_EMAIL_BUILDER)]
@@ -147,19 +155,23 @@ public class EmailBuilderTemplatesPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : EmailBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : EmailBuilderComponentListingPage<EmailTemplateDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "templates";
+    protected override string ComponentKind => "template";
+
+    protected override IReadOnlyList<EmailTemplateDto> GetComponents(EmailBuilderRegistryReadModel model) => model.EmailTemplates;
+
+    protected override Task<EmailConfigurationUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetEmailBuilderTemplateUsageAsync(identifier);
 }
 
 /// <summary>
-/// Client properties for the email builder component viewer page.
+/// Client properties for an Email Builder component listing page.
 /// </summary>
-public class EmailBuilderComponentViewerPageClientProperties : TemplateClientProperties
+/// <typeparam name="TComponent">Component definition DTO.</typeparam>
+public class EmailBuilderComponentViewerPageClientProperties<TComponent> : TemplateClientProperties
 {
-    public IEnumerable<EmailComponentDto> Widgets { get; set; } = [];
-    public IEnumerable<EmailComponentDto> Sections { get; set; } = [];
-    public IEnumerable<EmailTemplateDto> EmailTemplates { get; set; } = [];
-    public bool CanViewEmailBuilderUsages { get; set; }
-    public string ComponentView { get; set; } = string.Empty;
+    public IReadOnlyList<TComponent> Components { get; set; } = [];
+    public string ComponentKind { get; set; } = string.Empty;
+    public bool CanViewUsages { get; set; }
 }

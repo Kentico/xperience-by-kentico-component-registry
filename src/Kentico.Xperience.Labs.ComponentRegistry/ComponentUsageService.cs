@@ -253,15 +253,15 @@ public partial class ComponentUsageService(
                         ? reader.GetInt32(versionStatusOrdinal)
                         : 0;
                     int modifiedWhenOrdinal = reader.GetOrdinal("ContentItemCommonDataLastPublishedWhen");
-                    var modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
+                    DateTime? modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
                         ? reader.GetDateTime(modifiedWhenOrdinal)
-                        : DateTime.UtcNow;
+                        : null;
                     int configColumnOrdinal = reader.GetOrdinal(configColumnName);
                     string configJson = !await reader.IsDBNullAsync(configColumnOrdinal, cancellationToken)
                         ? reader.GetString(configColumnOrdinal)
                         : string.Empty;
 
-                    if (lastModified == null || modifiedWhen > lastModified)
+                    if (modifiedWhen is not null && (lastModified is null || modifiedWhen > lastModified))
                     {
                         lastModified = modifiedWhen;
                     }
@@ -389,15 +389,15 @@ public partial class ComponentUsageService(
                         ? reader.GetInt32(versionStatusOrdinal)
                         : 0;
                     int modifiedWhenOrdinal = reader.GetOrdinal("ContentItemCommonDataLastPublishedWhen");
-                    var modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
+                    DateTime? modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
                         ? reader.GetDateTime(modifiedWhenOrdinal)
-                        : DateTime.UtcNow;
+                        : null;
                     int configColumnOrdinal = reader.GetOrdinal(configColumnName);
                     string configJson = !await reader.IsDBNullAsync(configColumnOrdinal, cancellationToken)
                         ? reader.GetString(configColumnOrdinal)
                         : string.Empty;
 
-                    if (lastModified == null || modifiedWhen > lastModified)
+                    if (modifiedWhen is not null && (lastModified is null || modifiedWhen > lastModified))
                     {
                         lastModified = modifiedWhen;
                     }
@@ -645,7 +645,8 @@ public partial class ComponentUsageService(
                             ClassName = className,
                             ClassXmlSchema = classXmlSchema,
                             ClassFormDefinition = classFormDefinition,
-                            ClassTableName = classTableName
+                            ClassTableName = classTableName,
+                            ClassLastModified = classLastModified
                         });
                     }
 
@@ -685,7 +686,8 @@ public partial class ComponentUsageService(
                             FormID = formId,
                             FormName = formName,
                             FormDisplayName = formDisplayName,
-                            FormBuilderLayout = formBuilderLayout
+                            FormBuilderLayout = formBuilderLayout,
+                            FormLastModified = formLastModified
                         });
                     }
 
@@ -830,7 +832,7 @@ public class PageVariantDto
     public string LanguageName { get; set; } = string.Empty;
 
     /// <summary>
-    /// The date when this variant was last modified.
+    /// When this variant was last published (<c>CMS_ContentItemCommonData.ContentItemCommonDataLastPublishedWhen</c>). Null if never published.
     /// </summary>
     public DateTime? LastModified { get; set; }
 
@@ -968,7 +970,7 @@ public class EmailConfigurationVariantDto
     public string LanguageName { get; set; } = string.Empty;
 
     /// <summary>
-    /// The date when this variant was last modified.
+    /// When this variant was last published (<c>CMS_ContentItemCommonData.ContentItemCommonDataLastPublishedWhen</c>). Null if never published.
     /// </summary>
     public DateTime? LastModified { get; set; }
 
@@ -1070,6 +1072,11 @@ public class FormClassUsageDto
     /// The table name associated with the form class.
     /// </summary>
     public string ClassTableName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When the form class was last modified (<c>CMS_Class.ClassLastModified</c>).
+    /// </summary>
+    public DateTime? ClassLastModified { get; set; }
 }
 /// <summary>
 /// Represents a form builder form that uses a specific component or section.
@@ -1095,6 +1102,11 @@ public class FormBuilderFormUsageDto
     /// The complete JSON form builder layout configuration.
     /// </summary>
     public string FormBuilderLayout { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When the form was last modified (<c>CMS_Form.FormLastModified</c>).
+    /// </summary>
+    public DateTime? FormLastModified { get; set; }
 
     /// <summary>
     /// The administration UI path for this form.

@@ -151,14 +151,14 @@ Gets detailed usage information for a specific component identifier across all p
 
 - **Page Builder**: `ComponentUsageMcpResponse` - Contains `TotalPagesUsing`, `TotalVariants`, `LastModified`, and list of `Pages` with their `Variants`
 - **Email Builder**: `EmailConfigurationUsageDetailDto` - Contains `TotalEmailConfigurationsUsing`, `TotalVariants`, and list of `EmailConfigurations` with their `Variants`
-- **Form Builder**: `FormComponentUsageDetailDto` - Contains `TotalFormClassesUsing`, `TotalFormBuilderFormsUsing`, and lists of `FormClasses` and `FormBuilderForms`
+- **Form Builder**: `FormComponentUsageDetailDto` - Contains `TotalFormClassesUsing`, `TotalFormBuilderFormsUsing`, and lists of `FormClasses` (with `ClassLastModified`) and `FormBuilderForms` (with `FormLastModified`)
 - **Automation Builder**: `AutomationStepUsageDetailDto` - Contains `TotalProcessesUsing`, `TotalUsages`, `LastModified`, and list of `Processes` with their step/trigger `Usages` and configured `Parameters`
 
 For Page and Email usage details, each variant includes:
 
 - `LanguageName`: Display name of the language (e.g., "English (United States)")
 - `IsPublished`: Whether the variant is published
-- `LastModified`: Last modification date
+- `LastModified`: When the variant was last published (`null` if never published)
 - `ConfigurationJson`: The component's JSON configuration
 
 For Page Builder usage details, each page also includes:

@@ -25,38 +25,50 @@ import {
   PageTemplateDto,
 } from './ComponentDetails/types';
 
+type PageBuilderComponentKind = 'widget' | 'section' | 'template';
+
 interface PageBuilderComponentViewerClientProperties {
-  widgets: ComponentDto[];
-  sections: ComponentDto[];
-  pageTemplates: PageTemplateDto[];
-  canViewPageBuilderUsages: boolean;
-  componentView: string;
+  components: (ComponentDto | PageTemplateDto)[];
+  componentKind: PageBuilderComponentKind;
+  canViewUsages: boolean;
 }
+
+const viewConfig: Record<
+  PageBuilderComponentKind,
+  { title: string; description: string; emptyText: string }
+> = {
+  widget: {
+    title: 'Widget Components',
+    description: 'Reusable UI widgets for page building',
+    emptyText: 'No widgets registered',
+  },
+  section: {
+    title: 'Section Components',
+    description: 'Layout sections for structuring page content',
+    emptyText: 'No sections registered',
+  },
+  template: {
+    title: 'Page Template Components',
+    description: 'Complete page layouts for different content types',
+    emptyText: 'No page templates registered',
+  },
+};
 
 // Table row component with expandable details
 const ComponentTableRow: React.FC<{
   component: ComponentDto | PageTemplateDto;
-  componentType: 'widget' | 'section' | 'template';
-  canViewPageBuilderUsages: boolean;
-}> = ({ component, componentType, canViewPageBuilderUsages }) => {
+  showContentTypes: boolean;
+  canViewUsages: boolean;
+}> = ({ component, showContentTypes, canViewUsages }) => {
   const [expanded, setExpanded] = useState(false);
   const [usageData, setUsageData] = useState<ComponentUsageDetailDto | null>(
     null,
   );
 
-  // Use page command hooks for fetching usage data
-  const { execute: getPageBuilderPageTemplateUsage } = usePageCommand<
+  const { execute: getComponentUsage } = usePageCommand<
     ComponentUsageDetailDto,
     { componentIdentifier: string }
-  >('GetPageBuilderPageTemplateUsage', {
-    after: (response) => {
-      if (response) setUsageData(response);
-    },
-  });
-  const { execute: getPageBuilderWidgetUsage } = usePageCommand<
-    ComponentUsageDetailDto,
-    { componentIdentifier: string }
-  >('GetPageBuilderWidgetUsage', {
+  >('GetPageBuilderComponentUsage', {
     after: (response) => {
       if (response) setUsageData(response);
     },
@@ -64,16 +76,11 @@ const ComponentTableRow: React.FC<{
 
   const handleExpandClick = async () => {
     if (!expanded && !usageData) {
-      if (!canViewPageBuilderUsages) {
+      if (!canViewUsages) {
         return;
       }
       try {
-        const params = { componentIdentifier: component.identifier };
-        if (componentType === 'template') {
-          await getPageBuilderPageTemplateUsage(params);
-        } else {
-          await getPageBuilderWidgetUsage(params);
-        }
+        await getComponentUsage({ componentIdentifier: component.identifier });
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Failed to fetch usage data:', error);
@@ -82,8 +89,10 @@ const ComponentTableRow: React.FC<{
     setExpanded(!expanded);
   };
 
-  const isTemplate =
-    componentType === 'template' && 'contentTypeNames' in component;
+  const contentTypeNames =
+    showContentTypes && 'contentTypeNames' in component
+      ? component.contentTypeNames
+      : undefined;
 
   return (
     <>
@@ -91,9 +100,9 @@ const ComponentTableRow: React.FC<{
         <TableCell className="w-10">
           <button
             onClick={handleExpandClick}
-            disabled={!canViewPageBuilderUsages || (!usageData && expanded)}
+            disabled={!canViewUsages || (!usageData && expanded)}
             title={
-              !canViewPageBuilderUsages
+              !canViewUsages
                 ? 'Permission required to view component usages'
                 : ''
             }
@@ -112,9 +121,7 @@ const ComponentTableRow: React.FC<{
           </button>
         </TableCell>
         <TableCell>
-          <code className="xp-code-chip">
-            {component.identifier}
-          </code>
+          <code className="xp-code-chip">{component.identifier}</code>
         </TableCell>
         <IconTableCell iconClass={component.iconClass} />
         <TableCell className="font-semibold xp-text-default">
@@ -139,15 +146,12 @@ const ComponentTableRow: React.FC<{
             <span className="xp-muted-dash">—</span>
           )}
         </TableCell>
-        {isTemplate && (
+        {showContentTypes && (
           <TableCell>
-            {component.contentTypeNames.length > 0 ? (
+            {contentTypeNames && contentTypeNames.length > 0 ? (
               <div className="flex flex-wrap gap-1">
-                {component.contentTypeNames.map((ct) => (
-                  <span
-                    key={ct}
-                    className="xp-tag"
-                  >
+                {contentTypeNames.map((ct) => (
+                  <span key={ct} className="xp-tag">
                     {ct}
                   </span>
                 ))}
@@ -161,21 +165,17 @@ const ComponentTableRow: React.FC<{
 
       {expanded && (
         <TableRow>
-          <TableCell colSpan={isTemplate ? 7 : 6} className="p-0">
+          <TableCell colSpan={showContentTypes ? 7 : 6} className="p-0">
             <div className="p-4 xp-panel-subtle border-t">
               {usageData ? (
                 <ComponentDetailsPanel
                   data={usageData}
                   inspectedComponentTypeName={component.markedTypeName}
                 />
-              ) : expanded && !usageData ? (
+              ) : (
                 <div className="flex items-center justify-center p-8">
                   <Loader className="animate-spin xp-icon-muted mr-2" />
                   <span className="xp-text-muted">Loading usage data...</span>
-                </div>
-              ) : (
-                <div className="text-center p-8 xp-empty-text">
-                  <p>No usage data available</p>
                 </div>
               )}
             </div>
@@ -189,242 +189,89 @@ const ComponentTableRow: React.FC<{
 export const PageBuilderComponentViewerTemplate = (
   props: PageBuilderComponentViewerClientProperties,
 ) => {
-  const [widgetFilter, setWidgetFilter] = useState('');
-  const [sectionFilter, setSectionFilter] = useState('');
-  const [templateFilter, setTemplateFilter] = useState('');
+  const [filter, setFilter] = useState('');
 
-  const filteredWidgets = props.widgets.filter((widget) =>
-    widget.identifier.toLowerCase().includes(widgetFilter.trim().toLowerCase()),
-  );
-  const filteredSections = props.sections.filter((section) =>
-    section.identifier
-      .toLowerCase()
-      .includes(sectionFilter.trim().toLowerCase()),
-  );
-  const filteredTemplates = props.pageTemplates.filter((template) =>
-    template.identifier
-      .toLowerCase()
-      .includes(templateFilter.trim().toLowerCase()),
+  const config = viewConfig[props.componentKind];
+  if (!config) {
+    return null;
+  }
+
+  const components = props.components;
+  const showContentTypes = props.componentKind === 'template';
+
+  const normalizedFilter = filter.trim().toLowerCase();
+  const filteredComponents = components.filter((component) =>
+    component.identifier.toLowerCase().includes(normalizedFilter),
   );
 
   return (
     <div className="min-h-screen mr-4">
       <div className="w-full max-w-[110rem] mx-auto">
-        {props.componentView === 'widgets' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Widget Components
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Reusable UI widgets for page building
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {props.widgets.length > 0 ? (
-                  <>
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Filter by identifier..."
-                        value={widgetFilter}
-                        onChange={(e) => setWidgetFilter(e.target.value)}
-                      />
-                    </div>
-                    {filteredWidgets.length > 0 ? (
-                      <div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold">
-                                Identifier
-                              </TableHead>
-                              <IconTableHead />
-                              <TableHead className="font-semibold">
-                                Name
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Component Type
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredWidgets.map((widget, _index) => (
-                              <ComponentTableRow
-                                key={widget.identifier}
-                                component={widget}
-                                componentType="widget"
-                                canViewPageBuilderUsages={
-                                  props.canViewPageBuilderUsages
-                                }
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 xp-empty-text">
-                        <p>No components match this identifier filter</p>
-                      </div>
-                    )}
-                  </>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">{config.title}</CardTitle>
+            <CardDescription className="text-base">
+              {config.description}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-6">
+            {components.length > 0 ? (
+              <>
+                <div className="mb-4">
+                  <Input
+                    type="text"
+                    placeholder="Filter by identifier..."
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                  />
+                </div>
+                {filteredComponents.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-10"></TableHead>
+                        <TableHead className="font-semibold">
+                          Identifier
+                        </TableHead>
+                        <IconTableHead />
+                        <TableHead className="font-semibold">Name</TableHead>
+                        <TableHead className="font-semibold">
+                          Description
+                        </TableHead>
+                        <TableHead className="font-semibold">
+                          Component Type
+                        </TableHead>
+                        {showContentTypes && (
+                          <TableHead className="font-semibold">
+                            Content Types
+                          </TableHead>
+                        )}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredComponents.map((component) => (
+                        <ComponentTableRow
+                          key={component.identifier}
+                          component={component}
+                          showContentTypes={showContentTypes}
+                          canViewUsages={props.canViewUsages}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
                 ) : (
-                  <div className="text-center py-12 xp-empty-text">
-                    <p className="text-lg">No widgets registered</p>
+                  <div className="text-center py-8 xp-empty-text">
+                    <p>No components match this identifier filter</p>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-        )}
-
-        {props.componentView === 'sections' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Section Components
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Layout sections for structuring page content
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {props.sections.length > 0 ? (
-                  <>
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Filter by identifier..."
-                        value={sectionFilter}
-                        onChange={(e) => setSectionFilter(e.target.value)}
-                      />
-                    </div>
-                    {filteredSections.length > 0 ? (
-                      <div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold">
-                                Identifier
-                              </TableHead>
-                              <IconTableHead />
-                              <TableHead className="font-semibold">
-                                Name
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Component Type
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredSections.map((section, _index) => (
-                              <ComponentTableRow
-                                key={section.identifier}
-                                component={section}
-                                componentType="section"
-                                canViewPageBuilderUsages={
-                                  props.canViewPageBuilderUsages
-                                }
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 xp-empty-text">
-                        <p>No components match this identifier filter</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-12 xp-empty-text">
-                    <p className="text-lg">No sections registered</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-        )}
-
-        {props.componentView === 'templates' && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">
-                  Page Template Components
-                </CardTitle>
-                <CardDescription className="text-base">
-                  Complete page layouts for different content types
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                {props.pageTemplates.length > 0 ? (
-                  <>
-                    <div className="mb-4">
-                      <Input
-                        type="text"
-                        placeholder="Filter by identifier..."
-                        value={templateFilter}
-                        onChange={(e) => setTemplateFilter(e.target.value)}
-                      />
-                    </div>
-                    {filteredTemplates.length > 0 ? (
-                      <div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-10"></TableHead>
-                              <TableHead className="font-semibold">
-                                Identifier
-                              </TableHead>
-                              <IconTableHead />
-                              <TableHead className="font-semibold">
-                                Name
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Description
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Component Type
-                              </TableHead>
-                              <TableHead className="font-semibold">
-                                Content Types
-                              </TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredTemplates.map((template, _index) => (
-                              <ComponentTableRow
-                                key={template.identifier}
-                                component={template}
-                                componentType="template"
-                                canViewPageBuilderUsages={
-                                  props.canViewPageBuilderUsages
-                                }
-                              />
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 xp-empty-text">
-                        <p>No components match this identifier filter</p>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-center py-12 xp-empty-text">
-                    <p className="text-lg">No page templates registered</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-        )}
+              </>
+            ) : (
+              <div className="text-center py-12 xp-empty-text">
+                <p className="text-lg">{config.emptyText}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

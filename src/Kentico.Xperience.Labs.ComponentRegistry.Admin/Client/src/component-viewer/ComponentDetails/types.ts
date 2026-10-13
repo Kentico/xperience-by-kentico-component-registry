@@ -118,6 +118,7 @@ export interface FormClassUsageDto {
   classXmlSchema: string;
   classFormDefinition: string;
   classTableName: string;
+  classLastModified?: string;
 }
 
 export interface FormBuilderFormUsageDto {
@@ -125,6 +126,7 @@ export interface FormBuilderFormUsageDto {
   formName: string;
   formDisplayName: string;
   formBuilderLayout: string;
+  formLastModified?: string;
   adminPath?: string;
 }
 
