@@ -16,21 +16,21 @@ using Kentico.Xperience.Labs.ComponentRegistry.Admin;
     parentType: typeof(PageBuilderComponentViewerPage),
     slug: "widgets",
     name: "Widgets",
-    templateName: "@kentico/xperience-labs-component-registry-admin/PageBuilderComponentViewer",
+    templateName: PageBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 1)]
 [assembly: UIPage(
     uiPageType: typeof(PageBuilderSectionsPage),
     parentType: typeof(PageBuilderComponentViewerPage),
     slug: "sections",
     name: "Sections",
-    templateName: "@kentico/xperience-labs-component-registry-admin/PageBuilderComponentViewer",
+    templateName: PageBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 2)]
 [assembly: UIPage(
     uiPageType: typeof(PageBuilderTemplatesPage),
     parentType: typeof(PageBuilderComponentViewerPage),
     slug: "page-templates",
     name: "Page Templates",
-    templateName: "@kentico/xperience-labs-component-registry-admin/PageBuilderComponentViewer",
+    templateName: PageBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 3)]
 
 namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
@@ -40,63 +40,59 @@ namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
 /// </summary>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
 [UINavigation(true)]
-public class PageBuilderComponentViewerPage : SecondaryMenuSectionPage;
+public class PageBuilderComponentViewerPage : SecondaryMenuSectionPage
+{
+    public const string TEMPLATE_NAME = "@kentico/xperience-labs-component-registry-admin/PageBuilderComponentViewer";
+}
 
 /// <summary>
-/// Base page for displaying registered Page Builder components of a single type.
+/// Base page for displaying registered Page Builder components of a single kind.
+/// Each page sends only its own component definitions to the client.
 /// </summary>
+/// <typeparam name="TComponent">Component definition DTO sent to the client.</typeparam>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
-public abstract class PageBuilderComponentListingPage(
+public abstract class PageBuilderComponentListingPage<TComponent>(
     IPageLinkGenerator pageLinkGenerator,
     IComponentRegistryReadService componentRegistryReadService,
-    IComponentUsageService componentUsageService,
-    IUIPermissionEvaluator permissionEvaluator) : Page<PageBuilderComponentViewerPageClientProperties>
+    IUIPermissionEvaluator permissionEvaluator) : Page<PageBuilderComponentViewerPageClientProperties<TComponent>>
 {
-    protected abstract string ComponentView { get; }
+    /// <summary>
+    /// Component kind sent to the client: <c>widget</c>, <c>section</c> or <c>template</c>.
+    /// </summary>
+    protected abstract string ComponentKind { get; }
 
-    public override async Task<PageBuilderComponentViewerPageClientProperties> ConfigureTemplateProperties(
-        PageBuilderComponentViewerPageClientProperties properties)
+    protected abstract IReadOnlyList<TComponent> GetComponents(PageBuilderRegistryReadModel model);
+
+    protected abstract Task<ComponentUsageDetailDto> GetUsage(string identifier);
+
+    public override async Task<PageBuilderComponentViewerPageClientProperties<TComponent>> ConfigureTemplateProperties(
+        PageBuilderComponentViewerPageClientProperties<TComponent> properties)
     {
-        properties.ComponentView = ComponentView;
-
         var model = await componentRegistryReadService.GetPageBuilderRegistryAsync();
 
-        properties.Widgets = model.Widgets;
-        properties.Sections = model.Sections;
-        properties.PageTemplates = model.PageTemplates;
+        properties.ComponentKind = ComponentKind;
+        properties.Components = GetComponents(model);
 
-        // Evaluate permissions and propagate to client
-        var canViewPageBuilderUsages = await permissionEvaluator.Evaluate(
+        var canViewUsages = await permissionEvaluator.Evaluate(
             ComponentRegistryPermissions.VIEW_PAGE_BUILDER_USAGES);
-        properties.CanViewPageBuilderUsages = canViewPageBuilderUsages.Succeeded;
+        properties.CanViewUsages = canViewUsages.Succeeded;
 
         return properties;
     }
 
     /// <summary>
-    /// Retrieves detailed usage information for a page builder page template component.
+    /// Retrieves detailed usage information for a Page Builder component of this page's kind.
     /// </summary>
-    [PageCommand(CommandName = "GetPageBuilderPageTemplateUsage", Permission = ComponentRegistryPermissions.VIEW_PAGE_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetPageBuilderPageTemplateUsage(ComponentDetailsParams @params)
+    [PageCommand(CommandName = "GetPageBuilderComponentUsage", Permission = ComponentRegistryPermissions.VIEW_PAGE_BUILDER_USAGES)]
+    public async Task<ICommandResponse> GetPageBuilderComponentUsage(ComponentDetailsParams @params)
     {
-        var usage = await componentUsageService.GetPageBuilderPageTemplateUsageAsync(@params.ComponentIdentifier);
-        AddAdminPaths(usage);
-        return ResponseFrom(usage);
-    }
+        if (@params?.ComponentIdentifier is null)
+        {
+            return ResponseFrom("Component identifier is required");
+        }
 
-    /// <summary>
-    /// Retrieves detailed usage information for a page builder widget component.
-    /// </summary>
-    [PageCommand(CommandName = "GetPageBuilderWidgetUsage", Permission = ComponentRegistryPermissions.VIEW_PAGE_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetPageBuilderWidgetUsage(ComponentDetailsParams @params)
-    {
-        var usage = await componentUsageService.GetPageBuilderWidgetUsageAsync(@params.ComponentIdentifier);
-        AddAdminPaths(usage);
-        return ResponseFrom(usage);
-    }
+        var usage = await GetUsage(@params.ComponentIdentifier);
 
-    private void AddAdminPaths(ComponentUsageDetailDto usage)
-    {
         foreach (var page in usage.Pages)
         {
             foreach (var variant in page.Variants)
@@ -113,18 +109,25 @@ public abstract class PageBuilderComponentListingPage(
                     : adminPath;
             }
         }
+
+        return ResponseFrom(usage);
     }
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
 public class PageBuilderWidgetsPage(
-   IPageLinkGenerator pageLinkGenerator,
-   IComponentRegistryReadService componentRegistryReadService,
-   IComponentUsageService componentUsageService,
-   IUIPermissionEvaluator permissionEvaluator)
-   : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    IPageLinkGenerator pageLinkGenerator,
+    IComponentRegistryReadService componentRegistryReadService,
+    IComponentUsageService componentUsageService,
+    IUIPermissionEvaluator permissionEvaluator)
+    : PageBuilderComponentListingPage<ComponentDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "widgets";
+    protected override string ComponentKind => "widget";
+
+    protected override IReadOnlyList<ComponentDto> GetComponents(PageBuilderRegistryReadModel model) => model.Widgets;
+
+    protected override Task<ComponentUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetPageBuilderWidgetUsageAsync(identifier);
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
@@ -133,9 +136,14 @@ public class PageBuilderSectionsPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : PageBuilderComponentListingPage<ComponentDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "sections";
+    protected override string ComponentKind => "section";
+
+    protected override IReadOnlyList<ComponentDto> GetComponents(PageBuilderRegistryReadModel model) => model.Sections;
+
+    protected override Task<ComponentUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetPageBuilderSectionUsageAsync(identifier);
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_PAGE_BUILDER)]
@@ -144,19 +152,23 @@ public class PageBuilderTemplatesPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : PageBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : PageBuilderComponentListingPage<PageTemplateDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "templates";
+    protected override string ComponentKind => "template";
+
+    protected override IReadOnlyList<PageTemplateDto> GetComponents(PageBuilderRegistryReadModel model) => model.PageTemplates;
+
+    protected override Task<ComponentUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetPageBuilderPageTemplateUsageAsync(identifier);
 }
 
 /// <summary>
-/// Client properties for the component viewer page.
+/// Client properties for a Page Builder component listing page.
 /// </summary>
-public class PageBuilderComponentViewerPageClientProperties : TemplateClientProperties
+/// <typeparam name="TComponent">Component definition DTO.</typeparam>
+public class PageBuilderComponentViewerPageClientProperties<TComponent> : TemplateClientProperties
 {
-    public IEnumerable<ComponentDto> Widgets { get; set; } = [];
-    public IEnumerable<ComponentDto> Sections { get; set; } = [];
-    public IEnumerable<PageTemplateDto> PageTemplates { get; set; } = [];
-    public bool CanViewPageBuilderUsages { get; set; }
-    public string ComponentView { get; set; } = string.Empty;
+    public IReadOnlyList<TComponent> Components { get; set; } = [];
+    public string ComponentKind { get; set; } = string.Empty;
+    public bool CanViewUsages { get; set; }
 }

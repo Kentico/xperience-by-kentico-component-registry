@@ -18,10 +18,6 @@ export const PageListItem: React.FC<PageListItemProps> = ({
 }) => {
   const [variantsExpanded, setVariantsExpanded] = useState(false);
 
-  const modifiedDate = page.modifiedAt
-    ? new Date(page.modifiedAt).toLocaleDateString()
-    : new Date(page.createdAt).toLocaleDateString();
-
   return (
     <div className="border border-slate-300 rounded-lg overflow-hidden bg-white mb-3">
       <button
@@ -33,7 +29,7 @@ export const PageListItem: React.FC<PageListItemProps> = ({
           <p className="text-xs text-slate-600">
             {page.channelDisplayName} • {page.pagePath} • {page.variants.length}{' '}
             variant
-            {page.variants.length !== 1 ? 's' : ''} • Modified: {modifiedDate}
+            {page.variants.length !== 1 ? 's' : ''}
           </p>
         </div>
 

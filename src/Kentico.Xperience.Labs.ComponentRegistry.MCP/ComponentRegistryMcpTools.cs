@@ -12,7 +12,9 @@ public record ComponentDefinitionItem(
     string? IconClass,
     string? MarkedTypeName,
     string? PropertiesTypeName,
-    IReadOnlyList<string>? ContentTypeNames);
+    IReadOnlyList<string>? ContentTypeNames,
+    string? TriggerDataTypeName = null,
+    string? ObjectType = null);
 
 /// <summary>
 /// Response payload for MCP definition list tool.
@@ -92,6 +94,7 @@ internal static class ComponentRegistryMcpToolsValidation
         "page" or "pagebuilder" or "page-builder" => "page",
         "email" or "emailbuilder" or "email-builder" => "email",
         "form" or "formbuilder" or "form-builder" => "form",
+        "automation" or "automationbuilder" or "automation-builder" or "automations" or "marketing-automation" => "automation",
         _ => builder?.Trim().ToLowerInvariant() ?? string.Empty
     };
 
@@ -103,6 +106,9 @@ internal static class ComponentRegistryMcpToolsValidation
         "template" or "templates" => "template",
         "pagetemplate" or "page-template" or "page_templates" => "page-template",
         "component" or "components" => "component",
+        "trigger" or "triggers" => "trigger",
+        "action" or "actions" => "action",
+        "condition" or "conditions" => "condition",
         _ => componentType?.Trim().ToLowerInvariant() ?? string.Empty
     };
 }

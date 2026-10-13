@@ -16,14 +16,14 @@ using Kentico.Xperience.Labs.ComponentRegistry.Admin;
     parentType: typeof(FormBuilderComponentViewerPage),
     slug: "components",
     name: "Components",
-    templateName: "@kentico/xperience-labs-component-registry-admin/FormBuilderComponentViewer",
+    templateName: FormBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 1)]
 [assembly: UIPage(
     uiPageType: typeof(FormBuilderSectionsPage),
     parentType: typeof(FormBuilderComponentViewerPage),
     slug: "sections",
     name: "Sections",
-    templateName: "@kentico/xperience-labs-component-registry-admin/FormBuilderComponentViewer",
+    templateName: FormBuilderComponentViewerPage.TEMPLATE_NAME,
     order: 2)]
 
 namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
@@ -33,74 +33,59 @@ namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
 /// </summary>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
 [UINavigation(true)]
-public class FormBuilderComponentViewerPage : SecondaryMenuSectionPage;
+public class FormBuilderComponentViewerPage : SecondaryMenuSectionPage
+{
+    public const string TEMPLATE_NAME = "@kentico/xperience-labs-component-registry-admin/FormBuilderComponentViewer";
+}
 
 /// <summary>
-/// Base page for displaying registered Form Builder components of a single type.
+/// Base page for displaying registered Form Builder components of a single kind.
+/// Each page sends only its own component definitions to the client.
 /// </summary>
+/// <typeparam name="TComponent">Component definition DTO sent to the client.</typeparam>
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
-public abstract class FormBuilderComponentListingPage(
+public abstract class FormBuilderComponentListingPage<TComponent>(
     IPageLinkGenerator pageLinkGenerator,
     IComponentRegistryReadService componentRegistryReadService,
-    IComponentUsageService componentUsageService,
-    IUIPermissionEvaluator permissionEvaluator) : Page<FormBuilderComponentViewerPageClientProperties>
+    IUIPermissionEvaluator permissionEvaluator) : Page<FormBuilderComponentViewerPageClientProperties<TComponent>>
 {
-    protected abstract string ComponentView { get; }
+    /// <summary>
+    /// Component kind sent to the client: <c>component</c> or <c>section</c>.
+    /// </summary>
+    protected abstract string ComponentKind { get; }
 
-    public override async Task<FormBuilderComponentViewerPageClientProperties> ConfigureTemplateProperties(
-        FormBuilderComponentViewerPageClientProperties properties)
+    protected abstract IReadOnlyList<TComponent> GetComponents(FormBuilderRegistryReadModel model);
+
+    protected abstract Task<FormComponentUsageDetailDto> GetUsage(string identifier);
+
+    public override async Task<FormBuilderComponentViewerPageClientProperties<TComponent>> ConfigureTemplateProperties(
+        FormBuilderComponentViewerPageClientProperties<TComponent> properties)
     {
-        properties.ComponentView = ComponentView;
-
         var model = await componentRegistryReadService.GetFormBuilderRegistryAsync();
 
-        properties.FormComponents = model.FormComponents;
-        properties.FormSections = model.FormSections;
+        properties.ComponentKind = ComponentKind;
+        properties.Components = GetComponents(model);
 
-        // Evaluate permissions and propagate to client
-        var canViewFormBuilderUsages = await permissionEvaluator.Evaluate(
+        var canViewUsages = await permissionEvaluator.Evaluate(
             ComponentRegistryPermissions.VIEW_FORM_BUILDER_USAGES);
-        properties.CanViewFormBuilderUsages = canViewFormBuilderUsages.Succeeded;
+        properties.CanViewUsages = canViewUsages.Succeeded;
 
         return properties;
     }
 
+    /// <summary>
+    /// Retrieves detailed usage information for a Form Builder component of this page's kind.
+    /// </summary>
     [PageCommand(CommandName = "GetFormBuilderComponentUsage", Permission = ComponentRegistryPermissions.VIEW_FORM_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetFormBuilderComponentUsage(
-        ComponentDetailsParams @params)
+    public async Task<ICommandResponse> GetFormBuilderComponentUsage(ComponentDetailsParams @params)
     {
         if (@params?.ComponentIdentifier is null)
         {
             return ResponseFrom("Component identifier is required");
         }
 
-        var usage = await componentUsageService.GetFormBuilderComponentUsageAsync(
-            @params.ComponentIdentifier);
+        var usage = await GetUsage(@params.ComponentIdentifier);
 
-        AddAdminPaths(usage);
-
-        return ResponseFrom(usage);
-    }
-
-    [PageCommand(CommandName = "GetFormBuilderSectionUsage", Permission = ComponentRegistryPermissions.VIEW_FORM_BUILDER_USAGES)]
-    public async Task<ICommandResponse> GetFormBuilderSectionUsage(
-        ComponentDetailsParams @params)
-    {
-        if (@params?.ComponentIdentifier is null)
-        {
-            return ResponseFrom("Component identifier is required");
-        }
-
-        var usage = await componentUsageService.GetFormBuilderSectionUsageAsync(
-            @params.ComponentIdentifier);
-
-        AddAdminPaths(usage);
-
-        return ResponseFrom(usage);
-    }
-
-    private void AddAdminPaths(FormComponentUsageDetailDto usage)
-    {
         foreach (var form in usage.FormBuilderForms)
         {
             string adminPath = pageLinkGenerator.GetPath<FormBuilderTab>(
@@ -110,9 +95,11 @@ public abstract class FormBuilderComponentListingPage(
                 });
 
             form.AdminPath = adminPath.StartsWith('/')
-                    ? adminPath[1..]
-                    : adminPath;
+                ? adminPath[1..]
+                : adminPath;
         }
+
+        return ResponseFrom(usage);
     }
 }
 
@@ -122,9 +109,14 @@ public class FormBuilderComponentsPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : FormBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : FormBuilderComponentListingPage<FormComponentDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "components";
+    protected override string ComponentKind => "component";
+
+    protected override IReadOnlyList<FormComponentDto> GetComponents(FormBuilderRegistryReadModel model) => model.FormComponents;
+
+    protected override Task<FormComponentUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetFormBuilderComponentUsageAsync(identifier);
 }
 
 [UIEvaluatePermission(ComponentRegistryPermissions.VIEW_FORM_BUILDER)]
@@ -133,18 +125,23 @@ public class FormBuilderSectionsPage(
     IComponentRegistryReadService componentRegistryReadService,
     IComponentUsageService componentUsageService,
     IUIPermissionEvaluator permissionEvaluator)
-    : FormBuilderComponentListingPage(pageLinkGenerator, componentRegistryReadService, componentUsageService, permissionEvaluator)
+    : FormBuilderComponentListingPage<FormSectionDto>(pageLinkGenerator, componentRegistryReadService, permissionEvaluator)
 {
-    protected override string ComponentView => "sections";
+    protected override string ComponentKind => "section";
+
+    protected override IReadOnlyList<FormSectionDto> GetComponents(FormBuilderRegistryReadModel model) => model.FormSections;
+
+    protected override Task<FormComponentUsageDetailDto> GetUsage(string identifier) =>
+        componentUsageService.GetFormBuilderSectionUsageAsync(identifier);
 }
 
 /// <summary>
-/// Client properties for the form builder component viewer page.
+/// Client properties for a Form Builder component listing page.
 /// </summary>
-public class FormBuilderComponentViewerPageClientProperties : TemplateClientProperties
+/// <typeparam name="TComponent">Component definition DTO.</typeparam>
+public class FormBuilderComponentViewerPageClientProperties<TComponent> : TemplateClientProperties
 {
-    public IEnumerable<FormComponentDto> FormComponents { get; set; } = [];
-    public IEnumerable<FormSectionDto> FormSections { get; set; } = [];
-    public bool CanViewFormBuilderUsages { get; set; }
-    public string ComponentView { get; set; } = string.Empty;
+    public IReadOnlyList<TComponent> Components { get; set; } = [];
+    public string ComponentKind { get; set; } = string.Empty;
+    public bool CanViewUsages { get; set; }
 }

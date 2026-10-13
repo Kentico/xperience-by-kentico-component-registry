@@ -75,6 +75,27 @@ public interface IComponentUsageService
     /// <param name="sectionIdentifier">The unique identifier of the form section.</param>
     /// <returns>Form class usage details including all form classes using this section.</returns>
     public Task<FormComponentUsageDetailDto> GetFormBuilderSectionUsageAsync(string sectionIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose triggers use a specific custom automation trigger.
+    /// </summary>
+    /// <param name="triggerIdentifier">The unique identifier of the custom automation trigger.</param>
+    /// <returns>Automation process usage details including each matching trigger.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationTriggerUsageAsync(string triggerIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose steps use a specific custom automation action.
+    /// </summary>
+    /// <param name="actionIdentifier">The unique identifier of the custom automation action.</param>
+    /// <returns>Automation process usage details including each matching step.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationActionUsageAsync(string actionIdentifier);
+
+    /// <summary>
+    /// Gets automation processes whose steps use a specific custom automation condition.
+    /// </summary>
+    /// <param name="conditionIdentifier">The unique identifier of the custom automation condition.</param>
+    /// <returns>Automation process usage details including each matching step.</returns>
+    public Task<AutomationStepUsageDetailDto> GetAutomationConditionUsageAsync(string conditionIdentifier);
 }
 
 
@@ -82,9 +103,12 @@ public interface IComponentUsageService
 /// Service for retrieving component usage information from the database.
 /// Uses CMS.DataEngine.ConnectionHelper to query CMS_WebPageItem and CMS_ContentItemCommonData.
 /// </summary>
-public class ComponentUsageService(ILogger<ComponentUsageService> logger) : IComponentUsageService
+public partial class ComponentUsageService(
+    ILogger<ComponentUsageService> logger,
+    IComponentRegistryLocalizationService localizationService) : IComponentUsageService
 {
     private readonly ILogger<ComponentUsageService> logger = logger;
+    private readonly IComponentRegistryLocalizationService localizationService = localizationService;
 
     /// <inheritdoc/>
     public Task<ComponentUsageDetailDto> GetPageBuilderPageTemplateUsageAsync(string templateIdentifier) => GetComponentUsage(
@@ -229,15 +253,15 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                         ? reader.GetInt32(versionStatusOrdinal)
                         : 0;
                     int modifiedWhenOrdinal = reader.GetOrdinal("ContentItemCommonDataLastPublishedWhen");
-                    var modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
+                    DateTime? modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
                         ? reader.GetDateTime(modifiedWhenOrdinal)
-                        : DateTime.UtcNow;
+                        : null;
                     int configColumnOrdinal = reader.GetOrdinal(configColumnName);
                     string configJson = !await reader.IsDBNullAsync(configColumnOrdinal, cancellationToken)
                         ? reader.GetString(configColumnOrdinal)
                         : string.Empty;
 
-                    if (lastModified == null || modifiedWhen > lastModified)
+                    if (modifiedWhen is not null && (lastModified is null || modifiedWhen > lastModified))
                     {
                         lastModified = modifiedWhen;
                     }
@@ -365,15 +389,15 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                         ? reader.GetInt32(versionStatusOrdinal)
                         : 0;
                     int modifiedWhenOrdinal = reader.GetOrdinal("ContentItemCommonDataLastPublishedWhen");
-                    var modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
+                    DateTime? modifiedWhen = !await reader.IsDBNullAsync(modifiedWhenOrdinal, cancellationToken)
                         ? reader.GetDateTime(modifiedWhenOrdinal)
-                        : DateTime.UtcNow;
+                        : null;
                     int configColumnOrdinal = reader.GetOrdinal(configColumnName);
                     string configJson = !await reader.IsDBNullAsync(configColumnOrdinal, cancellationToken)
                         ? reader.GetString(configColumnOrdinal)
                         : string.Empty;
 
-                    if (lastModified == null || modifiedWhen > lastModified)
+                    if (modifiedWhen is not null && (lastModified is null || modifiedWhen > lastModified))
                     {
                         lastModified = modifiedWhen;
                     }
@@ -621,7 +645,8 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                             ClassName = className,
                             ClassXmlSchema = classXmlSchema,
                             ClassFormDefinition = classFormDefinition,
-                            ClassTableName = classTableName
+                            ClassTableName = classTableName,
+                            ClassLastModified = classLastModified
                         });
                     }
 
@@ -661,7 +686,8 @@ public class ComponentUsageService(ILogger<ComponentUsageService> logger) : ICom
                             FormID = formId,
                             FormName = formName,
                             FormDisplayName = formDisplayName,
-                            FormBuilderLayout = formBuilderLayout
+                            FormBuilderLayout = formBuilderLayout,
+                            FormLastModified = formLastModified
                         });
                     }
 
@@ -806,7 +832,7 @@ public class PageVariantDto
     public string LanguageName { get; set; } = string.Empty;
 
     /// <summary>
-    /// The date when this variant was last modified.
+    /// When this variant was last published (<c>CMS_ContentItemCommonData.ContentItemCommonDataLastPublishedWhen</c>). Null if never published.
     /// </summary>
     public DateTime? LastModified { get; set; }
 
@@ -944,7 +970,7 @@ public class EmailConfigurationVariantDto
     public string LanguageName { get; set; } = string.Empty;
 
     /// <summary>
-    /// The date when this variant was last modified.
+    /// When this variant was last published (<c>CMS_ContentItemCommonData.ContentItemCommonDataLastPublishedWhen</c>). Null if never published.
     /// </summary>
     public DateTime? LastModified { get; set; }
 
@@ -1046,6 +1072,11 @@ public class FormClassUsageDto
     /// The table name associated with the form class.
     /// </summary>
     public string ClassTableName { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When the form class was last modified (<c>CMS_Class.ClassLastModified</c>).
+    /// </summary>
+    public DateTime? ClassLastModified { get; set; }
 }
 /// <summary>
 /// Represents a form builder form that uses a specific component or section.
@@ -1071,6 +1102,11 @@ public class FormBuilderFormUsageDto
     /// The complete JSON form builder layout configuration.
     /// </summary>
     public string FormBuilderLayout { get; set; } = string.Empty;
+
+    /// <summary>
+    /// When the form was last modified (<c>CMS_Form.FormLastModified</c>).
+    /// </summary>
+    public DateTime? FormLastModified { get; set; }
 
     /// <summary>
     /// The administration UI path for this form.

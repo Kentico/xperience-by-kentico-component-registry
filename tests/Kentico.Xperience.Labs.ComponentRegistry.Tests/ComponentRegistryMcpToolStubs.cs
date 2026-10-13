@@ -3,8 +3,12 @@ namespace Kentico.Xperience.Labs.ComponentRegistry.Tests;
 internal sealed class StubReadService(
     PageBuilderRegistryReadModel page,
     EmailBuilderRegistryReadModel email,
-    FormBuilderRegistryReadModel form) : IComponentRegistryReadService
+    FormBuilderRegistryReadModel form,
+    AutomationRegistryReadModel? automation = null) : IComponentRegistryReadService
 {
+    public Task<AutomationRegistryReadModel> GetAutomationRegistryAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(automation ?? new AutomationRegistryReadModel([], [], []));
+
     public Task<PageBuilderRegistryReadModel> GetPageBuilderRegistryAsync(CancellationToken cancellationToken = default) => Task.FromResult(page);
 
     public Task<EmailBuilderRegistryReadModel> GetEmailBuilderRegistryAsync(CancellationToken cancellationToken = default) => Task.FromResult(email);
@@ -68,6 +72,24 @@ internal sealed class StubUsageService : IComponentUsageService
     {
         LastCall = $"form-section:{sectionIdentifier}";
         return Task.FromResult(new FormComponentUsageDetailDto { ComponentIdentifier = sectionIdentifier, ComponentType = "Section" });
+    }
+
+    public Task<AutomationStepUsageDetailDto> GetAutomationTriggerUsageAsync(string triggerIdentifier)
+    {
+        LastCall = $"automation-trigger:{triggerIdentifier}";
+        return Task.FromResult(new AutomationStepUsageDetailDto { ComponentIdentifier = triggerIdentifier, ComponentType = "Trigger" });
+    }
+
+    public Task<AutomationStepUsageDetailDto> GetAutomationActionUsageAsync(string actionIdentifier)
+    {
+        LastCall = $"automation-action:{actionIdentifier}";
+        return Task.FromResult(new AutomationStepUsageDetailDto { ComponentIdentifier = actionIdentifier, ComponentType = "Action" });
+    }
+
+    public Task<AutomationStepUsageDetailDto> GetAutomationConditionUsageAsync(string conditionIdentifier)
+    {
+        LastCall = $"automation-condition:{conditionIdentifier}";
+        return Task.FromResult(new AutomationStepUsageDetailDto { ComponentIdentifier = conditionIdentifier, ComponentType = "Condition" });
     }
 
     private static ComponentUsageDetailDto CreatePageUsage(string identifier, string componentType) =>

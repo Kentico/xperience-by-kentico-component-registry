@@ -22,10 +22,6 @@ export const ComponentDetailsPanel: React.FC<ComponentDetailsPanelProps> = ({
   data,
   inspectedComponentTypeName,
 }) => {
-  const lastModified = data.lastModified
-    ? new Date(data.lastModified)
-    : undefined;
-
   if (isPageUsageData(data)) {
     return (
       <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -35,7 +31,6 @@ export const ComponentDetailsPanel: React.FC<ComponentDetailsPanelProps> = ({
             <UsageStatistics
               totalPages={data.totalPagesUsing}
               totalVariants={data.totalVariants}
-              lastModified={lastModified}
               label="Pages Using Component"
             />
           </div>
@@ -62,7 +57,6 @@ export const ComponentDetailsPanel: React.FC<ComponentDetailsPanelProps> = ({
           <UsageStatistics
             totalPages={data.totalEmailConfigurationsUsing}
             totalVariants={data.totalVariants}
-            lastModified={lastModified}
             label="Configurations Using Component"
           />
         </div>

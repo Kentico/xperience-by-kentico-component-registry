@@ -9,11 +9,13 @@
 | Kentico.Xperience.Labs.ComponentRegistry.MCP   | [![Kentico.Xperience.Labs.ComponentRegistry.MCP - NuGet Package](https://img.shields.io/nuget/v/Kentico.Xperience.Labs.ComponentRegistry.MCP.svg)](https://www.nuget.org/packages/Kentico.Xperience.Labs.ComponentRegistry.MCP)       |
 
 > [!NOTE]
-> Migrating from `Kentico.Xperience.ComponentRegistry*`? These packages were renamed to `Kentico.Xperience.Labs.ComponentRegistry*` (final release under the old IDs: 2.0.0). Version 3.0.0 is functionally equal to 2.0.0. Swap your package references and update `using` statements to `Kentico.Xperience.Labs.ComponentRegistry`.
+> Migrating from `Kentico.Xperience.ComponentRegistry*`? These packages were renamed to `Kentico.Xperience.Labs.ComponentRegistry*` (final release under the old IDs: 2.0.0). Version 3.0.0 adds the Automation Builder registry (custom automation triggers, actions, and conditions) and includes breaking API changes. Swap your package references and update `using` statements to `Kentico.Xperience.Labs.ComponentRegistry`.
 
 ## Description
 
-This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets, and explore which channels and web pages use those components all through a friendly user interface in the Xperience administration.
+This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets or custom automation steps, and explore which channels, web pages, forms, emails, and automation processes use those components all through a friendly user interface in the Xperience administration.
+
+A **Builder structure** tab on web pages and Email Builder emails visualizes the Page Builder or Email Builder configuration (template, editable areas, sections, zones, widgets, and personalized variants) and flags components that are no longer registered.
 
 It optionally exposes the entire component registry over an in-application hosted MCP server, giving agents the ability to identify where components are used across channels, and even visit Page Builder pages using components to visually validate their configuration and design.
 
@@ -26,6 +28,12 @@ Interested in how and why this library was created? Read the blog post [Dream an
 ![Component registry for Email Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-email-builder.jpg)
 
 ![Component registry for Form Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-form-builder.jpg)
+
+![Component registry for Automation Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-automation-builder.jpg)
+
+![Builder structure tab of a web page in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-web-page-builder-structure.jpg)
+
+![Builder structure tab of an email in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-email-builder-structure.jpg)
 
 ## Requirements
 

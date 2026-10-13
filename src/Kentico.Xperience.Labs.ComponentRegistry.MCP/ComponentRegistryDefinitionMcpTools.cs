@@ -14,7 +14,7 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
     /// Lists registered component definitions for a builder and component type.
     /// </summary>
     [McpServerTool(Name = "component_registry_list_definitions")]
-    [Description("List registered component definitions for page/email/form builders. builder: page|email|form. componentType: widget|section|template|page-template|component|all")]
+    [Description("List registered component definitions for page/email/form builders and custom automation steps. builder: page|email|form|automation. componentType: widget|section|template|page-template|component|trigger|action|condition|all")]
     public async Task<ComponentDefinitionListResponse> ListComponentDefinitions(
         string builder,
         string componentType = "all",
@@ -28,7 +28,8 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
             "page" => await ListPageBuilderDefinitions(normalizedType, cancellationToken),
             "email" => await ListEmailBuilderDefinitions(normalizedType, cancellationToken),
             "form" => await ListFormBuilderDefinitions(normalizedType, cancellationToken),
-            _ => throw new ArgumentException($"Unknown builder '{builder}'. Use page|email|form.", nameof(builder))
+            "automation" => await ListAutomationDefinitions(normalizedType, cancellationToken),
+            _ => throw new ArgumentException($"Unknown builder '{builder}'. Use page|email|form|automation.", nameof(builder))
         };
 
         return new ComponentDefinitionListResponse(normalizedBuilder, normalizedType, items);
@@ -169,4 +170,50 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
 
         return items;
     }
+
+    private async Task<List<ComponentDefinitionItem>> ListAutomationDefinitions(string componentType, CancellationToken cancellationToken)
+    {
+        var model = await readService.GetAutomationRegistryAsync(cancellationToken);
+        List<ComponentDefinitionItem> items = [];
+
+        if (componentType is "all" or "trigger")
+        {
+            items.AddRange(model.Triggers.Select(t => new ComponentDefinitionItem(
+                Builder: "automation",
+                ComponentType: "trigger",
+                Identifier: t.Identifier,
+                Name: t.Name,
+                Description: t.Description,
+                IconClass: t.IconName,
+                MarkedTypeName: t.ImplementationTypeName,
+                PropertiesTypeName: t.PropertiesTypeName,
+                ContentTypeNames: null,
+                TriggerDataTypeName: t.TriggerDataTypeName,
+                ObjectType: t.ObjectType)));
+        }
+
+        if (componentType is "all" or "action")
+        {
+            items.AddRange(model.Actions.Select(a => ToAutomationStepItem(a, "action")));
+        }
+
+        if (componentType is "all" or "condition")
+        {
+            items.AddRange(model.Conditions.Select(c => ToAutomationStepItem(c, "condition")));
+        }
+
+        return items;
+    }
+
+    private static ComponentDefinitionItem ToAutomationStepItem(AutomationStepDto step, string componentType) =>
+        new(
+            Builder: "automation",
+            ComponentType: componentType,
+            Identifier: step.Identifier,
+            Name: step.Name,
+            Description: step.Description,
+            IconClass: step.IconName,
+            MarkedTypeName: step.ImplementationTypeName,
+            PropertiesTypeName: step.PropertiesTypeName,
+            ContentTypeNames: null);
 }
