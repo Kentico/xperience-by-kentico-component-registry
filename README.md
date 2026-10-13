@@ -29,6 +29,12 @@ Interested in how and why this library was created? Read the blog post [Dream an
 
 ![Component registry for Form Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-form-builder.jpg)
 
+![Component registry for Automation Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-automation-builder.jpg)
+
+![Builder structure tab of a web page in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-web-page-builder-structure.jpg)
+
+![Builder structure tab of an email in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-email-builder-structure.jpg)
+
 ## Requirements
 
 ### Library Version Matrix

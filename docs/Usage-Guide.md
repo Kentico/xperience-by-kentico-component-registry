@@ -38,7 +38,7 @@ You can control access to Component Registry application and each of the 4 regis
 
 ### Builder structure tab
 
-Web pages in website channels get a **Builder structure (Labs)** tab next to the page's other tabs (Page Builder, Content, Properties, ...). It visualizes the page's Page Builder configuration in the currently selected language as nested boxes:
+Web pages in website channels get a **Builder structure (Labs)** tab, directly after the **Page Builder** tab. It visualizes the page's Page Builder configuration in the currently selected language as nested boxes:
 
 page template → editable areas → sections → widget zones → widgets → widget variants
 
@@ -48,11 +48,15 @@ The tab shows the latest version of the page (which can be a draft) and notes wh
 
 The tab requires the `View Page Builder components` permission of the Component Registry application, in addition to the role's access to the website channel.
 
+![Builder structure tab of a web page](images/component-registry-admin-web-page-builder-structure.jpg)
+
 Emails in email channels get the same **Builder structure (Labs)** tab, directly after the **Email Builder** tab. It visualizes the email's Email Builder configuration as nested boxes:
 
 email template → editable areas → sections → widget zones → widgets
 
 The tab is only shown for emails that use Email Builder. Emails based on a legacy email template and emails of content types not listed in `EmailBuilderOptions.AllowedEmailContentTypeNames` don't get the tab. The tab requires the `View Email Builder components` permission of the Component Registry application, in addition to the role's access to the email channel.
+
+![Builder structure tab of an email](images/component-registry-admin-email-builder-structure.jpg)
 
 ### MCP endpoint (optional)
 
