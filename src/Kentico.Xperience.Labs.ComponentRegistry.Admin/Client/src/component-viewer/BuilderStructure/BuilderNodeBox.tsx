@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { ChevronDown, TriangleAlert } from 'lucide-react';
-import { BuilderLabels, BuilderNodeDto, BuilderNodeKind } from './types';
+import {
+  BuilderDisplayMode,
+  BuilderLabels,
+  BuilderNodeDto,
+  BuilderNodeKind,
+} from './types';
 import { ComponentIcon } from '../ui/component-icon';
 import { PropertyList } from './PropertyList';
 import { cn } from '../../lib/utils';
@@ -55,6 +60,7 @@ const NotRegisteredTag = () => (
 interface BuilderNodeBoxProps {
   readonly node: BuilderNodeDto;
   readonly labels: BuilderLabels;
+  readonly mode: BuilderDisplayMode;
   readonly index?: number;
 }
 
@@ -84,28 +90,37 @@ const collapseSingleVariant = (node: BuilderNodeDto): BuilderNodeDto => {
 export const BuilderNodeBox = ({
   node: sourceNode,
   labels,
+  mode,
   index = 0,
 }: BuilderNodeBoxProps) => {
   const [expanded, setExpanded] = useState(true);
   const node = collapseSingleVariant(sourceNode);
   const kindLabel = getKindLabel(node.kind, labels);
   const showsComponent = node.componentIdentifier && node.kind !== 'variant';
+  const detailed = mode === 'detailed';
   const hasBody =
-    node.properties.length > 0 ||
-    node.conditionParameters.length > 0 ||
     node.children.length > 0 ||
-    Boolean(node.conditionType) ||
-    Boolean(node.configurationId);
+    (detailed &&
+      (node.properties.length > 0 ||
+        node.conditionParameters.length > 0 ||
+        Boolean(node.conditionType) ||
+        Boolean(node.configurationId)));
 
   return (
     <div
       className={cn(
-        'rounded-lg border border-l-4 bg-white',
+        'border border-l-4 bg-white',
+        detailed ? 'rounded-lg' : 'rounded-md',
         node.isRegistered === false ? 'border-[#ffd9ae]' : 'border-[#dfdfdf]',
         kindAccentClasses[node.kind],
       )}
     >
-      <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+      <div
+        className={cn(
+          'flex flex-wrap items-center',
+          detailed ? 'gap-2 px-3 py-2' : 'gap-1.5 px-2 py-0.5 text-sm',
+        )}
+      >
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
@@ -136,7 +151,7 @@ export const BuilderNodeBox = ({
         )}
         {node.isRegistered === false && <NotRegisteredTag />}
         {node.conditionType && <span className="xp-tag">Personalized</span>}
-        {node.instanceId && (
+        {detailed && node.instanceId && (
           <span
             className="ml-auto font-mono text-xs xp-text-muted"
             title="Instance identifier"
@@ -146,8 +161,13 @@ export const BuilderNodeBox = ({
         )}
       </div>
       {expanded && hasBody && (
-        <div className="space-y-3 border-t border-[#dfdfdf] px-3 py-3">
-          {node.configurationId && (
+        <div
+          className={cn(
+            'border-t border-[#dfdfdf]',
+            detailed ? 'space-y-3 px-3 py-3' : 'space-y-1 p-1.5',
+          )}
+        >
+          {detailed && node.configurationId && (
             <PropertyList
               title="Template configuration"
               properties={[
@@ -158,7 +178,7 @@ export const BuilderNodeBox = ({
               ]}
             />
           )}
-          {node.conditionType && (
+          {detailed && node.conditionType && (
             <PropertyList
               title="Personalization"
               properties={[
@@ -166,22 +186,23 @@ export const BuilderNodeBox = ({
               ]}
             />
           )}
-          {node.conditionParameters.length > 0 && (
+          {detailed && node.conditionParameters.length > 0 && (
             <PropertyList
               title="Condition parameters"
               properties={node.conditionParameters}
             />
           )}
-          {node.properties.length > 0 && (
+          {detailed && node.properties.length > 0 && (
             <PropertyList title="Properties" properties={node.properties} />
           )}
           {node.children.length > 0 && (
-            <div className="space-y-2">
+            <div className={detailed ? 'space-y-2' : 'space-y-1'}>
               {node.children.map((child, childIndex) => (
                 <BuilderNodeBox
                   key={child.instanceId ?? `${child.kind}-${childIndex}`}
                   node={child}
                   labels={labels}
+                  mode={mode}
                   index={childIndex}
                 />
               ))}

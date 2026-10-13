@@ -36,27 +36,29 @@ Run the application and navigate to the "Component Registry" application in the 
 
 You can control access to Component Registry application and each of the 4 registry sections (Page Builder, Email Builder, Form Builder, Automation Builder) through Xperience's role and permission management.
 
-### Builder structure tab
+### Structure tab
 
-Web pages in website channels get a **Builder structure (Labs)** tab, directly after the **Page Builder** tab. It visualizes the page's Page Builder configuration in the currently selected language as nested boxes:
+Web pages in website channels get a **Structure (Labs)** tab, directly after the **Page Builder** tab. It visualizes the page's Page Builder configuration in the currently selected language as nested boxes:
 
 page template → editable areas → sections → widget zones → widgets → widget variants
 
 Each box shows the component identifier, the registered name and icon, instance identifiers, and configured properties. Personalized widgets list each variant with its personalization condition parameters. Components that are not registered in the application (for example, removed widgets) are marked **Not registered**.
 
-The tab shows the latest version of the page (which can be a draft) and notes when it differs from the published version. A collapsed **Raw JSON** region at the bottom shows the stored widgets (editable areas) JSON and page template configuration JSON. Pages that don't use Page Builder show an empty state.
+A **Simple | Detailed** toggle in the tab header switches the display mode. **Simple** (default) shows only the compact structure with component names, identifiers, and the **Not registered** and **Personalized** tags, which keeps large pages scannable. **Detailed** also shows instance identifiers, properties, personalization condition parameters, and template configuration. The browser remembers the selected mode for both web pages and emails. Switching modes expands all boxes again.
+
+The tab shows the latest version of the page (which can be a draft) and notes when it differs from the published version. A collapsed **Raw JSON** region at the bottom shows the stored widgets (editable areas) JSON and page template configuration JSON. Pages that don't use Page Builder show an empty state. The tab is disabled wherever the **Page Builder** tab is disabled (folders, untranslated pages, content-only pages, and content types without Page Builder support).
 
 The tab requires the `View Page Builder components` permission of the Component Registry application, in addition to the role's access to the website channel.
 
-![Builder structure tab of a web page](images/component-registry-admin-web-page-builder-structure.jpg)
+![Structure tab of a web page](images/component-registry-admin-web-page-builder-structure.jpg)
 
-Emails in email channels get the same **Builder structure (Labs)** tab, directly after the **Email Builder** tab. It visualizes the email's Email Builder configuration as nested boxes:
+Emails in email channels get the same **Structure (Labs)** tab, directly after the **Email Builder** tab. It visualizes the email's Email Builder configuration as nested boxes:
 
 email template → editable areas → sections → widget zones → widgets
 
-The tab is only shown for emails that use Email Builder. Emails based on a legacy email template and emails of content types not listed in `EmailBuilderOptions.AllowedEmailContentTypeNames` don't get the tab. The tab requires the `View Email Builder components` permission of the Component Registry application, in addition to the role's access to the email channel.
+The tab follows the **Email Builder** tab: it's hidden for emails based on a legacy email template and disabled for emails of content types not listed in `EmailBuilderOptions.AllowedEmailContentTypeNames`. The tab requires the `View Email Builder components` permission of the Component Registry application, in addition to the role's access to the email channel.
 
-![Builder structure tab of an email](images/component-registry-admin-email-builder-structure.jpg)
+![Structure tab of an email](images/component-registry-admin-email-builder-structure.jpg)
 
 ### MCP endpoint (optional)
 
@@ -109,11 +111,11 @@ For VS Code, use `.vscode/mcp.json` with `"servers"` instead of `"mcpServers"`.
 ### Permissions
 
 - `View`: Required to see the application tile on the administration dashboard
-- `View Page Builder components`: Enables viewing the Page Builder component registry page and the **Builder structure (Labs)** tab of web pages.
+- `View Page Builder components`: Enables viewing the Page Builder component registry page and the **Structure (Labs)** tab of web pages.
 - `View Page Builder component usages`: Gives expanded permissions on the registry page, enabling viewing the usages of individual Page Builder components across all website channels. This permission does not evaluate any [page permission management](https://docs.kentico.com/x/permissions_pagelevel_xp) and could expose content to administration users they normally would not have access to.
 - `View Form Builder components`: Enables viewing the Form Builder component registry page.
 - `View Form Builder component usages`: Gives expanded permissions on the registry page, enabling viewing the usages of individual Form Builder components across all forms. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose a list of forms to administration users they normally would not have access to.
-- `View Email Builder components`: Enables viewing the Email Builder component registry page and the **Builder structure (Labs)** tab of emails.
+- `View Email Builder components`: Enables viewing the Email Builder component registry page and the **Structure (Labs)** tab of emails.
 - `View Email Builder component usages`: Gives expanded permissions on the registry page, enabling viewing the usages of individual Email Builder components across all email channels. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose content to administration users they normally would not have access to.
 - `View Automation Builder components`: Enables viewing the Automation Builder registry pages (custom automation triggers, actions, and conditions).
 - `View Automation Builder component usages`: Gives expanded permissions on the registry pages, enabling viewing the automation processes that use individual custom triggers, actions, and conditions, including each step's configured parameters. This permission does not evaluate other roles defined through [role management](https://docs.kentico.com/x/7IVwCg) and could expose automation processes to administration users they normally would not have access to.

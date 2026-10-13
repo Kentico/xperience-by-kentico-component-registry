@@ -3,7 +3,7 @@ using Kentico.Xperience.Admin.Base;
 namespace Kentico.Xperience.Labs.ComponentRegistry.Admin;
 
 /// <summary>
-/// Shared constants of the "Builder structure (Labs)" tabs of web pages (<see cref="WebPageBuilderStructurePage"/>)
+/// Shared constants of the "Structure (Labs)" tabs of web pages (<see cref="WebPageBuilderStructurePage"/>)
 /// and emails (<see cref="EmailBuilderStructurePage"/>).
 /// </summary>
 internal static class BuilderStructureTab
@@ -13,7 +13,7 @@ internal static class BuilderStructureTab
     /// <summary>
     /// Tab name. "(Labs)" tells editors the tab comes from this Labs extension, not the product.
     /// </summary>
-    public const string NAME = "Builder structure (Labs)";
+    public const string NAME = "Structure (Labs)";
 
     public const string TEMPLATE_NAME = "@kentico/xperience-labs-component-registry-admin/BuilderStructure";
 }
