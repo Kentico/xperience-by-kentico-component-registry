@@ -3,6 +3,8 @@ using System.Data;
 using CMS.ContentEngine;
 using CMS.DataEngine;
 
+using Kentico.Xperience.Admin.Base;
+
 using Microsoft.Extensions.Logging;
 
 namespace Kentico.Xperience.Labs.ComponentRegistry;
@@ -84,6 +86,15 @@ public interface IComponentUsageService
     public Task<AutomationStepUsageDetailDto> GetAutomationTriggerUsageAsync(string triggerIdentifier);
 
     /// <summary>
+    /// Gets class fields assigned an Admin UI form component, read from <c>field/settings/controlname</c>
+    /// of <c>CMS_Class.ClassFormDefinition</c> and class UI forms (<c>CMS_AlternativeForm.FormDefinition</c>).
+    /// Does not detect components used only in C# code.
+    /// </summary>
+    /// <param name="componentIdentifier">The identifier of the Admin UI form component.</param>
+    /// <returns>Classes and fields referencing the component.</returns>
+    public Task<AdminFormComponentUsageDetailDto> GetAdminFormComponentUsageAsync(string componentIdentifier);
+
+    /// <summary>
     /// Gets automation processes whose steps use a specific custom automation action.
     /// </summary>
     /// <param name="actionIdentifier">The unique identifier of the custom automation action.</param>
@@ -105,10 +116,12 @@ public interface IComponentUsageService
 /// </summary>
 public partial class ComponentUsageService(
     ILogger<ComponentUsageService> logger,
-    IComponentRegistryLocalizationService localizationService) : IComponentUsageService
+    IComponentRegistryLocalizationService localizationService,
+    IPageLinkGenerator pageLinkGenerator) : IComponentUsageService
 {
     private readonly ILogger<ComponentUsageService> logger = logger;
     private readonly IComponentRegistryLocalizationService localizationService = localizationService;
+    private readonly IPageLinkGenerator pageLinkGenerator = pageLinkGenerator;
 
     /// <inheritdoc/>
     public Task<ComponentUsageDetailDto> GetPageBuilderPageTemplateUsageAsync(string templateIdentifier) => GetComponentUsage(

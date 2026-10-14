@@ -4,8 +4,12 @@ internal sealed class StubReadService(
     PageBuilderRegistryReadModel page,
     EmailBuilderRegistryReadModel email,
     FormBuilderRegistryReadModel form,
-    AutomationRegistryReadModel? automation = null) : IComponentRegistryReadService
+    AutomationRegistryReadModel? automation = null,
+    AdminFormComponentRegistryReadModel? adminForm = null) : IComponentRegistryReadService
 {
+    public Task<AdminFormComponentRegistryReadModel> GetAdminFormComponentRegistryAsync(CancellationToken cancellationToken = default) =>
+        Task.FromResult(adminForm ?? new AdminFormComponentRegistryReadModel([]));
+
     public Task<AutomationRegistryReadModel> GetAutomationRegistryAsync(CancellationToken cancellationToken = default) =>
         Task.FromResult(automation ?? new AutomationRegistryReadModel([], [], []));
 
@@ -72,6 +76,12 @@ internal sealed class StubUsageService : IComponentUsageService
     {
         LastCall = $"form-section:{sectionIdentifier}";
         return Task.FromResult(new FormComponentUsageDetailDto { ComponentIdentifier = sectionIdentifier, ComponentType = "Section" });
+    }
+
+    public Task<AdminFormComponentUsageDetailDto> GetAdminFormComponentUsageAsync(string componentIdentifier)
+    {
+        LastCall = $"admin-form-component:{componentIdentifier}";
+        return Task.FromResult(new AdminFormComponentUsageDetailDto { ComponentIdentifier = componentIdentifier });
     }
 
     public Task<AutomationStepUsageDetailDto> GetAutomationTriggerUsageAsync(string triggerIdentifier)

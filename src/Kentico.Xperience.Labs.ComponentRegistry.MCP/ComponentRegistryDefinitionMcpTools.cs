@@ -14,7 +14,7 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
     /// Lists registered component definitions for a builder and component type.
     /// </summary>
     [McpServerTool(Name = "component_registry_list_definitions")]
-    [Description("List registered component definitions for page/email/form builders and custom automation steps. builder: page|email|form|automation. componentType: widget|section|template|page-template|component|trigger|action|condition|all")]
+    [Description("List registered component definitions for page/email/form builders, Admin UI form components, and custom automation steps. builder: page|email|form|admin-form|automation. componentType: widget|section|template|page-template|component|trigger|action|condition|all")]
     public async Task<ComponentDefinitionListResponse> ListComponentDefinitions(
         string builder,
         string componentType = "all",
@@ -28,8 +28,9 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
             "page" => await ListPageBuilderDefinitions(normalizedType, cancellationToken),
             "email" => await ListEmailBuilderDefinitions(normalizedType, cancellationToken),
             "form" => await ListFormBuilderDefinitions(normalizedType, cancellationToken),
+            "admin-form" => await ListAdminFormDefinitions(normalizedType, cancellationToken),
             "automation" => await ListAutomationDefinitions(normalizedType, cancellationToken),
-            _ => throw new ArgumentException($"Unknown builder '{builder}'. Use page|email|form|automation.", nameof(builder))
+            _ => throw new ArgumentException($"Unknown builder '{builder}'. Use page|email|form|admin-form|automation.", nameof(builder))
         };
 
         return new ComponentDefinitionListResponse(normalizedBuilder, normalizedType, items);
@@ -169,6 +170,27 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
         }
 
         return items;
+    }
+
+    private async Task<List<ComponentDefinitionItem>> ListAdminFormDefinitions(string componentType, CancellationToken cancellationToken)
+    {
+        var model = await readService.GetAdminFormComponentRegistryAsync(cancellationToken);
+
+        if (componentType is not ("all" or "component"))
+        {
+            return [];
+        }
+
+        return model.FormComponents.Select(c => new ComponentDefinitionItem(
+            Builder: "admin-form",
+            ComponentType: "component",
+            Identifier: c.Identifier,
+            Name: c.Name,
+            Description: null,
+            IconClass: null,
+            MarkedTypeName: c.MarkedTypeName,
+            PropertiesTypeName: null,
+            ContentTypeNames: null)).ToList();
     }
 
     private async Task<List<ComponentDefinitionItem>> ListAutomationDefinitions(string componentType, CancellationToken cancellationToken)

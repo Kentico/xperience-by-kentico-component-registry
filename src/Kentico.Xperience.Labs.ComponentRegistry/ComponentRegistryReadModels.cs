@@ -59,6 +59,15 @@ public record FormComponentDto(
     string? MarkedTypeName);
 
 /// <summary>
+/// Data transfer object for Admin UI form component definitions.
+/// </summary>
+public record AdminFormComponentDto(
+    string Identifier,
+    string Name,
+    string? MarkedTypeName,
+    bool IsAvailable);
+
+/// <summary>
 /// Data transfer object for form builder section definitions.
 /// </summary>
 public record FormSectionDto(
@@ -128,6 +137,12 @@ public record EmailBuilderRegistryReadModel(
 public record FormBuilderRegistryReadModel(
     IReadOnlyList<FormComponentDto> FormComponents,
     IReadOnlyList<FormSectionDto> FormSections);
+
+/// <summary>
+/// Aggregated read model for Admin UI form component definitions.
+/// </summary>
+public record AdminFormComponentRegistryReadModel(
+    IReadOnlyList<AdminFormComponentDto> FormComponents);
 
 /// <summary>
 /// Aggregated read model for custom automation step definitions.

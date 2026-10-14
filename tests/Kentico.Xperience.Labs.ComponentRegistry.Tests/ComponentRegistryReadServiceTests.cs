@@ -72,6 +72,29 @@ public class ComponentRegistryReadServiceTests
         Assert.That(formModel.FormSections[0].Name, Is.EqualTo("loc:Form Section"));
     }
 
+    [Test]
+    public async Task GetAdminFormComponentRegistryAsync_MapsOrdersAndKeepsBuilderComponentsSeparate()
+    {
+        var adminStore = new InMemoryStore<AdminFormComponentDefinition>([
+            new AdminFormComponentDefinition("Acme.Z", "Z", typeof(string), isAvailable: false),
+            new AdminFormComponentDefinition("Acme.A", "A", null)
+        ]);
+        var builderStore = new InMemoryStore<FormBuilderComponentDefinition>([
+            new FormBuilderComponentDefinition("builder.component", "Builder")
+        ]);
+
+        var service = CreateReadService(
+            formComponentStore: builderStore,
+            adminFormComponentStore: adminStore,
+            localizationService: new PrefixLocalizationService("loc:"));
+
+        var model = await service.GetAdminFormComponentRegistryAsync();
+
+        Assert.That(model.FormComponents.Select(c => c.Identifier), Is.EqualTo(new[] { "Acme.A", "Acme.Z" }));
+        Assert.That(model.FormComponents[0], Is.EqualTo(new AdminFormComponentDto("Acme.A", "loc:A", null, true)));
+        Assert.That(model.FormComponents[1], Is.EqualTo(new AdminFormComponentDto("Acme.Z", "loc:Z", typeof(string).FullName, false)));
+    }
+
     private static ComponentRegistryReadService CreateReadService(
         IComponentDefinitionStore<PageBuilderWidgetDefinition>? pageWidgetStore = null,
         IComponentDefinitionStore<PageBuilderSectionDefinition>? pageSectionStore = null,
@@ -81,6 +104,7 @@ public class ComponentRegistryReadServiceTests
         IComponentDefinitionStore<EmailBuilderTemplateDefinition>? emailTemplateStore = null,
         IComponentDefinitionStore<FormBuilderComponentDefinition>? formComponentStore = null,
         IComponentDefinitionStore<FormBuilderSectionDefinition>? formSectionStore = null,
+        IComponentDefinitionStore<AdminFormComponentDefinition>? adminFormComponentStore = null,
         IComponentRegistryLocalizationService? localizationService = null)
         => new(
             pageWidgetStore ?? new InMemoryStore<PageBuilderWidgetDefinition>([]),
@@ -91,6 +115,7 @@ public class ComponentRegistryReadServiceTests
             emailTemplateStore ?? new InMemoryStore<EmailBuilderTemplateDefinition>([]),
             formComponentStore ?? new InMemoryStore<FormBuilderComponentDefinition>([]),
             formSectionStore ?? new InMemoryStore<FormBuilderSectionDefinition>([]),
+            adminFormComponentStore ?? new InMemoryStore<AdminFormComponentDefinition>([]),
             Substitute.For<ICustomAutomationTriggerProvider>(),
             Substitute.For<ICustomAutomationActionProvider>(),
             Substitute.For<ICustomAutomationConditionProvider>(),
