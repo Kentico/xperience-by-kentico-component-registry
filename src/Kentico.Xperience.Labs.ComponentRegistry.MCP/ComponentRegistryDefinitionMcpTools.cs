@@ -181,7 +181,7 @@ public class ComponentRegistryDefinitionMcpTools(IComponentRegistryReadService r
             return [];
         }
 
-        return model.FormComponents.Select(c => new ComponentDefinitionItem(
+        return model.FormComponents.Where(c => c.IsAvailable).Select(c => new ComponentDefinitionItem(
             Builder: "admin-form",
             ComponentType: "component",
             Identifier: c.Identifier,

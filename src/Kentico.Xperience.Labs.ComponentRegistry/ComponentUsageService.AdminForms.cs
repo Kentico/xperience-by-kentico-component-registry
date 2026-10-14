@@ -28,7 +28,8 @@ public partial class ComponentUsageService
             C.ClassFormDefinition AS FormDefinition
         FROM CMS_Class C
         LEFT JOIN CMS_Resource R ON R.ResourceID = C.ClassResourceID
-        WHERE C.ClassFormDefinition IS NOT NULL";
+        WHERE C.ClassFormDefinition IS NOT NULL
+            AND CHARINDEX(@controlName, C.ClassFormDefinition) > 0";
 
     // Object type editing UIs (custom and system module classes) are stored as UI forms, not in the class definition.
     private const string ADMIN_FORM_COMPONENT_UI_FORM_QUERY = @"
@@ -48,7 +49,8 @@ public partial class ComponentUsageService
         FROM CMS_AlternativeForm F
         INNER JOIN CMS_Class C ON C.ClassID = F.FormClassID
         LEFT JOIN CMS_Resource R ON R.ResourceID = C.ClassResourceID
-        WHERE F.FormDefinition IS NOT NULL";
+        WHERE F.FormDefinition IS NOT NULL
+            AND CHARINDEX(@controlName, F.FormDefinition) > 0";
 
     /// <inheritdoc/>
     public async Task<AdminFormComponentUsageDetailDto> GetAdminFormComponentUsageAsync(string componentIdentifier)
@@ -82,8 +84,11 @@ public partial class ComponentUsageService
 
         using var connection = ConnectionHelper.GetConnection();
 
+        // SQL pre-filter only; the parser still performs the exact match
+        QueryDataParameters CreateParameters() => new() { { "@controlName", componentIdentifier } };
+
         var classReader = await connection.ExecuteReaderAsync(
-            new QueryParameters(ADMIN_FORM_COMPONENT_CLASS_QUERY, [], QueryTypeEnum.SQLQuery), CommandBehavior.Default, default);
+            new QueryParameters(ADMIN_FORM_COMPONENT_CLASS_QUERY, CreateParameters(), QueryTypeEnum.SQLQuery), CommandBehavior.Default, default);
         if (classReader is not null)
         {
             await using (classReader)
@@ -123,7 +128,7 @@ public partial class ComponentUsageService
         }
 
         var uiFormReader = await connection.ExecuteReaderAsync(
-            new QueryParameters(ADMIN_FORM_COMPONENT_UI_FORM_QUERY, [], QueryTypeEnum.SQLQuery), CommandBehavior.Default, default);
+            new QueryParameters(ADMIN_FORM_COMPONENT_UI_FORM_QUERY, CreateParameters(), QueryTypeEnum.SQLQuery), CommandBehavior.Default, default);
         if (uiFormReader is not null)
         {
             await using (uiFormReader)
