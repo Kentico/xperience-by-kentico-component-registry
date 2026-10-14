@@ -132,10 +132,18 @@ const AdminFormComponentTableRow: React.FC<{
           <button
             onClick={handleExpandClick}
             disabled={isLoading || !canViewUsages}
+            aria-label={
+              !canViewUsages
+                ? 'Permission required to view component usages'
+                : expanded
+                  ? 'Collapse component usage'
+                  : 'Expand component usage'
+            }
+            aria-expanded={expanded}
             title={
               !canViewUsages
                 ? 'Permission required to view component usages'
-                : ''
+                : undefined
             }
             className="xp-icon-button disabled:opacity-50 disabled:cursor-not-allowed"
           >
