@@ -17,8 +17,10 @@ import {
 } from './ui/table';
 import { Input } from './ui/input';
 import { Callout } from './ui/callout';
+import { Checkbox } from '@kentico/xperience-admin-components';
 import { ChevronDown, Link, Loader } from 'lucide-react';
 import {
+  AdminFormComponentClassUsageDto,
   AdminFormComponentDto,
   AdminFormComponentFieldUsageDto,
   AdminFormComponentUsageDetailDto,
@@ -31,6 +33,21 @@ interface AdminFormComponentViewerClientProperties {
 }
 
 const formatDate = (value: string) => new Date(value).toLocaleString();
+
+type ClassKind = 'content' | 'schema' | 'object';
+
+const classKinds: { kind: ClassKind; label: string }[] = [
+  { kind: 'content', label: 'Content type' },
+  { kind: 'schema', label: 'Reusable field schema' },
+  { kind: 'object', label: 'Object type' },
+];
+
+const getClassKind = (usedClass: AdminFormComponentClassUsageDto): ClassKind =>
+  usedClass.reusableFieldSchemaIdentifier
+    ? 'schema'
+    : usedClass.classType === 'Content'
+      ? 'content'
+      : 'object';
 
 const FieldUsageList: React.FC<{
   fields: AdminFormComponentFieldUsageDto[];
@@ -62,6 +79,7 @@ const AdminFormComponentTableRow: React.FC<{
 }> = ({ component, canViewUsages }) => {
   const [expanded, setExpanded] = useState(false);
   const [classFilter, setClassFilter] = useState('');
+  const [selectedKinds, setSelectedKinds] = useState<ClassKind[]>([]);
   const [usageData, setUsageData] =
     useState<AdminFormComponentUsageDetailDto | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -94,10 +112,18 @@ const AdminFormComponentTableRow: React.FC<{
   const normalizedClassFilter = classFilter.trim().toLowerCase();
   const filteredClasses = (usageData?.classes ?? []).filter(
     (c) =>
-      !normalizedClassFilter ||
-      c.classDisplayName.toLowerCase().includes(normalizedClassFilter) ||
-      c.className.toLowerCase().includes(normalizedClassFilter),
+      (selectedKinds.length === 0 || selectedKinds.includes(getClassKind(c))) &&
+      (!normalizedClassFilter ||
+        c.classDisplayName.toLowerCase().includes(normalizedClassFilter) ||
+        c.className.toLowerCase().includes(normalizedClassFilter)),
   );
+
+  const toggleKind = (kind: ClassKind) =>
+    setSelectedKinds((current) =>
+      current.includes(kind)
+        ? current.filter((k) => k !== kind)
+        : [...current, kind],
+    );
 
   return (
     <>
@@ -173,11 +199,32 @@ const AdminFormComponentTableRow: React.FC<{
                       />
                     )}
                     {usageData && usageData.classes.length > 0 && (
-                      <Input
-                        placeholder="Filter by name or code name..."
-                        value={classFilter}
-                        onChange={(e) => setClassFilter(e.target.value)}
-                      />
+                      <>
+                        <Input
+                          placeholder="Filter by name or code name..."
+                          value={classFilter}
+                          onChange={(e) => setClassFilter(e.target.value)}
+                        />
+                        <div
+                          className="flex flex-col gap-1"
+                          role="group"
+                          aria-label="Filter by type"
+                        >
+                          {classKinds.map(({ kind, label }) => {
+                            const count = usageData.classes.filter(
+                              (c) => getClassKind(c) === kind,
+                            ).length;
+                            return (
+                              <Checkbox
+                                key={kind}
+                                label={`${label} (${count})`}
+                                checked={selectedKinds.includes(kind)}
+                                onChange={() => toggleKind(kind)}
+                              />
+                            );
+                          })}
+                        </div>
+                      </>
                     )}
                     <p className="text-xs xp-text-muted">
                       Based on field editor assignments saved in class form
