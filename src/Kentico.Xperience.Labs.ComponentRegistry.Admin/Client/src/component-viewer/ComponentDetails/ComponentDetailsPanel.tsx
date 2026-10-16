@@ -24,53 +24,35 @@ export const ComponentDetailsPanel: React.FC<ComponentDetailsPanelProps> = ({
 }) => {
   if (isPageUsageData(data)) {
     return (
-      <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Statistics Column */}
-          <div>
-            <UsageStatistics
-              totalPages={data.totalPagesUsing}
-              totalVariants={data.totalVariants}
-              label="Pages Using Component"
-            />
-          </div>
-
-          {/* Pages List Column */}
-          <div className="md:col-span-3">
-            <PageList
-              pages={data.pages}
-              inspectedComponentIdentifier={data.componentIdentifier}
-              inspectedComponentType={data.componentType}
-              inspectedComponentTypeName={inspectedComponentTypeName}
-            />
-          </div>
-        </div>
+      <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+        <UsageStatistics
+          totalPages={data.totalPagesUsing}
+          totalVariants={data.totalVariants}
+          label="Pages Using Component"
+        />
+        <PageList
+          pages={data.pages}
+          inspectedComponentIdentifier={data.componentIdentifier}
+          inspectedComponentType={data.componentType}
+          inspectedComponentTypeName={inspectedComponentTypeName}
+        />
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Statistics Column */}
-        <div>
-          <UsageStatistics
-            totalPages={data.totalEmailConfigurationsUsing}
-            totalVariants={data.totalVariants}
-            label="Configurations Using Component"
-          />
-        </div>
-
-        {/* Email Configurations List Column */}
-        <div className="md:col-span-3">
-          <EmailConfigurationList
-            emailConfigurations={data.emailConfigurations}
-            inspectedComponentIdentifier={data.componentIdentifier}
-            inspectedComponentType={data.componentType}
-            inspectedComponentTypeName={inspectedComponentTypeName}
-          />
-        </div>
-      </div>
+    <div className="p-4 bg-slate-50 rounded-lg border border-slate-200 space-y-3">
+      <UsageStatistics
+        totalPages={data.totalEmailConfigurationsUsing}
+        totalVariants={data.totalVariants}
+        label="Configurations Using Component"
+      />
+      <EmailConfigurationList
+        emailConfigurations={data.emailConfigurations}
+        inspectedComponentIdentifier={data.componentIdentifier}
+        inspectedComponentType={data.componentType}
+        inspectedComponentTypeName={inspectedComponentTypeName}
+      />
     </div>
   );
 };

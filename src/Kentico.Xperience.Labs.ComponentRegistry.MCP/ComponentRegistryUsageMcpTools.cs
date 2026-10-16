@@ -14,7 +14,7 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
     /// Gets usage detail for a specific registered component identifier.
     /// </summary>
     [McpServerTool(Name = "component_registry_get_usage")]
-    [Description("Get usage detail for one component by builder/type/identifier. builder: page|email|form|automation. type: widget|template|page-template|component|section|trigger|action|condition")]
+    [Description("Get usage detail for one component by builder/type/identifier. builder: page|email|form|admin-form|automation. type: widget|template|page-template|component|section|trigger|action|condition")]
     public async Task<object> GetComponentUsage(
         string builder,
         string componentType,
@@ -41,6 +41,7 @@ public class ComponentRegistryUsageMcpTools(IComponentUsageService componentUsag
             ("email", "template") => await componentUsageService.GetEmailBuilderTemplateUsageAsync(componentIdentifier),
             ("form", "component") => await componentUsageService.GetFormBuilderComponentUsageAsync(componentIdentifier),
             ("form", "section") => await componentUsageService.GetFormBuilderSectionUsageAsync(componentIdentifier),
+            ("admin-form", "component") => await componentUsageService.GetAdminFormComponentUsageAsync(componentIdentifier),
             ("automation", "trigger") => await componentUsageService.GetAutomationTriggerUsageAsync(componentIdentifier),
             ("automation", "action") => await componentUsageService.GetAutomationActionUsageAsync(componentIdentifier),
             ("automation", "condition") => await componentUsageService.GetAutomationConditionUsageAsync(componentIdentifier),

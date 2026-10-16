@@ -2,6 +2,7 @@ using System.Reflection;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using AdminRegisterFormComponentAttribute = Kentico.Xperience.Admin.Base.Forms.RegisterFormComponentAttribute;
 using RegisterEmailSectionAttribute = Kentico.EmailBuilder.Web.Mvc.RegisterEmailSectionAttribute;
 using RegisterEmailTemplateAttribute = Kentico.EmailBuilder.Web.Mvc.RegisterEmailTemplateAttribute;
 using RegisterEmailWidgetAttribute = Kentico.EmailBuilder.Web.Mvc.RegisterEmailWidgetAttribute;
@@ -32,7 +33,7 @@ public static class ServiceCollectionComponentRegistryExtensions
     }
 
     /// <summary>
-    /// Registers component registry services by scanning specified assemblies for Page Builder, Email Builder, and Form Builder components
+    /// Registers component registry services by scanning specified assemblies for Page Builder, Email Builder, Form Builder, and Admin UI form components
     /// </summary>
     /// <param name="services">Service collection</param>
     /// <param name="assembliesToScan">Assemblies to scan for component registrations</param>
@@ -202,6 +203,25 @@ public static class ServiceCollectionComponentRegistryExtensions
                     markedType: attr.MarkedType,
                     description: attr.Description,
                     iconClass: attr.IconClass));
+            }
+            return store;
+        });
+
+        services.AddSingleton<IComponentDefinitionStore<AdminFormComponentDefinition>>(_ =>
+        {
+            var store = new ComponentDefinitionStore<AdminFormComponentDefinition>();
+            var attrs = assemblies
+                .SelectMany(a => a.GetCustomAttributes(typeof(AdminRegisterFormComponentAttribute), inherit: false))
+                .Cast<AdminRegisterFormComponentAttribute>()
+                .DistinctBy(a => a.Identifier, StringComparer.InvariantCultureIgnoreCase);
+
+            foreach (var attr in attrs)
+            {
+                store.Add(new AdminFormComponentDefinition(
+                    identifier: attr.Identifier,
+                    name: attr.Name,
+                    markedType: attr.MarkedType,
+                    isAvailable: attr.Available));
             }
             return store;
         });

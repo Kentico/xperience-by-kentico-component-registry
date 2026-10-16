@@ -13,7 +13,7 @@
 
 ## Description
 
-This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets or custom automation steps, and explore which channels, web pages, forms, emails, and automation processes use those components all through a friendly user interface in the Xperience administration.
+This project enables administrators to view all registered custom components in an Xperience by Kentico application, like Page Builder widgets, custom automation steps, or administration UI form components, and explore which channels, web pages, forms, emails, automation processes, content types, and object types use those components all through a friendly user interface in the Xperience administration.
 
 A **Structure (Labs)** tab on web pages and Email Builder emails visualizes the Page Builder or Email Builder configuration (template, editable areas, sections, zones, widgets, and personalized variants) and flags components that are no longer registered.
 
@@ -30,6 +30,8 @@ Interested in how and why this library was created? Read the blog post [Dream an
 ![Component registry for Form Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-form-builder.jpg)
 
 ![Component registry for Automation Builder in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-automation-builder.jpg)
+
+![Component registry for administration UI form components in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-ui-form-components.jpg)
 
 ![Structure tab of a web page in Xperience administration](https://raw.githubusercontent.com/Kentico/xperience-by-kentico-component-registry/refs/heads/main/docs/images/component-registry-admin-web-page-builder-structure.jpg)
 

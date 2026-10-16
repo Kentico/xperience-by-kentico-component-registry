@@ -94,6 +94,7 @@ internal static class ComponentRegistryMcpToolsValidation
         "page" or "pagebuilder" or "page-builder" => "page",
         "email" or "emailbuilder" or "email-builder" => "email",
         "form" or "formbuilder" or "form-builder" => "form",
+        "admin-form" or "adminform" or "ui-form" or "admin-ui-form" => "admin-form",
         "automation" or "automationbuilder" or "automation-builder" or "automations" or "marketing-automation" => "automation",
         _ => builder?.Trim().ToLowerInvariant() ?? string.Empty
     };

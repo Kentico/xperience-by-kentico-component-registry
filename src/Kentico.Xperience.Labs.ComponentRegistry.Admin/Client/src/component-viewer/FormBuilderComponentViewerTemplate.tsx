@@ -23,6 +23,7 @@ import {
   FormComponentDto,
   FormComponentUsageDetailDto,
   FormSectionDto,
+  UsageStats,
 } from './ComponentDetails';
 
 type FormBuilderComponentKind = 'component' | 'section';
@@ -257,16 +258,14 @@ const FormComponentTableRow: React.FC<{
                           Form Builder
                         </h6>
                         <div className="space-y-3">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
-                              <div className="text-xs xp-text-muted font-medium">
-                                Total Forms
-                              </div>
-                              <div className="text-xl font-bold xp-text-default">
-                                {combinedForms.length}
-                              </div>
-                            </div>
-                          </div>
+                          <UsageStats
+                            stats={[
+                              {
+                                label: 'Total Forms',
+                                value: combinedForms.length,
+                              },
+                            ]}
+                          />
 
                           {combinedForms.length > 0 ? (
                             <div className="mt-4">
