@@ -185,3 +185,48 @@ export interface AutomationStepUsageDetailDto {
   lastModified?: string;
   processes: AutomationProcessUsageDto[];
 }
+
+export interface AdminFormComponentDto {
+  identifier: string;
+  name: string;
+  markedTypeName?: string;
+  isAvailable: boolean;
+}
+
+export interface AdminFormComponentFieldUsageDto {
+  fieldName: string;
+  fieldGuid?: string;
+  fieldCaption?: string;
+  schemaIdentifier?: string;
+  schemaName?: string;
+  schemaCodeName?: string;
+}
+
+export interface AdminFormComponentUIFormUsageDto {
+  formId: number;
+  formName: string;
+  formDisplayName: string;
+  formLastModified?: string;
+  adminPath?: string;
+  fields: AdminFormComponentFieldUsageDto[];
+}
+
+export interface AdminFormComponentClassUsageDto {
+  classId: number;
+  className: string;
+  classDisplayName: string;
+  classType?: string;
+  classLastModified?: string;
+  adminPath?: string;
+  reusableFieldSchemaIdentifier?: string;
+  fields: AdminFormComponentFieldUsageDto[];
+  uiForms: AdminFormComponentUIFormUsageDto[];
+}
+
+export interface AdminFormComponentUsageDetailDto {
+  componentIdentifier: string;
+  totalClassesUsing: number;
+  totalFieldsUsing: number;
+  lastModified?: string;
+  classes: AdminFormComponentClassUsageDto[];
+}

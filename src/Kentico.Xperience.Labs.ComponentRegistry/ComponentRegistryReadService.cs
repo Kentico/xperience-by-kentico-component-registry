@@ -23,6 +23,11 @@ public interface IComponentRegistryReadService
     public Task<FormBuilderRegistryReadModel> GetFormBuilderRegistryAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets all Admin UI form component definitions registered with the Admin Base <c>RegisterFormComponentAttribute</c>.
+    /// </summary>
+    public Task<AdminFormComponentRegistryReadModel> GetAdminFormComponentRegistryAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets all custom automation trigger, action, and condition definitions.
     /// </summary>
     public Task<AutomationRegistryReadModel> GetAutomationRegistryAsync(CancellationToken cancellationToken = default);
@@ -40,6 +45,7 @@ public class ComponentRegistryReadService(
     IComponentDefinitionStore<EmailBuilderTemplateDefinition> emailBuilderTemplateStore,
     IComponentDefinitionStore<FormBuilderComponentDefinition> formBuilderComponentStore,
     IComponentDefinitionStore<FormBuilderSectionDefinition> formBuilderSectionStore,
+    IComponentDefinitionStore<AdminFormComponentDefinition> adminFormComponentStore,
     ICustomAutomationTriggerProvider automationTriggerProvider,
     ICustomAutomationActionProvider automationActionProvider,
     ICustomAutomationConditionProvider automationConditionProvider,
@@ -151,6 +157,23 @@ public class ComponentRegistryReadService(
             .ToList();
 
         return Task.FromResult(new FormBuilderRegistryReadModel(components, sections));
+    }
+
+    /// <inheritdoc/>
+    public Task<AdminFormComponentRegistryReadModel> GetAdminFormComponentRegistryAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var components = adminFormComponentStore.GetAll()
+            .Select(c => new AdminFormComponentDto(
+                c.Identifier,
+                localizationService.Localize(c.Name),
+                c.MarkedType?.FullName,
+                c.IsAvailable))
+            .OrderBy(c => c.Identifier, StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        return Task.FromResult(new AdminFormComponentRegistryReadModel(components));
     }
 
     /// <inheritdoc/>

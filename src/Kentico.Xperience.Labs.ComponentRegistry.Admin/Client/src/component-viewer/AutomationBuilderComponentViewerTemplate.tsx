@@ -24,6 +24,7 @@ import {
   AutomationStepDto,
   AutomationStepUsageDetailDto,
   AutomationTriggerDto,
+  UsageStats,
 } from './ComponentDetails';
 
 type AutomationStepKind = 'trigger' | 'action' | 'condition';
@@ -292,24 +293,15 @@ const AutomationStepTableRow: React.FC<{
                   </h5>
                   {usageData ? (
                     <div className="space-y-3">
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
-                          <div className="text-xs xp-text-muted font-medium">
-                            Automation Processes
-                          </div>
-                          <div className="text-xl font-bold xp-text-default">
-                            {usageData.totalProcessesUsing}
-                          </div>
-                        </div>
-                        <div className="bg-[#f5f5f5] p-3 rounded border border-[#dfdfdf]">
-                          <div className="text-xs xp-text-muted font-medium">
-                            {usageLabel}
-                          </div>
-                          <div className="text-xl font-bold xp-text-default">
-                            {usageData.totalUsages}
-                          </div>
-                        </div>
-                      </div>
+                      <UsageStats
+                        stats={[
+                          {
+                            label: 'Automation Processes',
+                            value: usageData.totalProcessesUsing,
+                          },
+                          { label: usageLabel, value: usageData.totalUsages },
+                        ]}
+                      />
 
                       {usageData.processes.length > 0 ? (
                         <div className="mt-4">
