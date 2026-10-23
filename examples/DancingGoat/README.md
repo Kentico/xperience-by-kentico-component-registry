@@ -10,6 +10,12 @@ This sample is generated from `Kentico.Xperience.Templates` version `31.9.2` and
 
 See [Contributing Setup](../../docs/Contributing-Setup.md) for database and Management API secret configuration. The local site runs at `http://localhost:18319`, with Component Registry MCP tools at `/mcp`.
 
+Run `aspire run` from the repository root to start this sample and the Component
+Registry admin client together. Existing SQL Server and machine-wide Mailpit are
+reused by default; optional containers and explicit database setup are documented
+in Contributing Setup. [Playwright tests](../../tests/e2e/README.md) require a
+licensed local database and test administrator credentials.
+
 ## AI-assisted development
 
 The project is set up for AI coding assistants: agent instructions, a design-guidance skill, and the Kentico [Documentation MCP](https://docs.kentico.com/x/mcp_server_xp) and [Management MCP](https://docs.kentico.com/x/management_api_xp) servers configured in the repository root `.mcp.json`, alongside the Component Registry MCP server.
