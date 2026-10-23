@@ -2,6 +2,11 @@ using System.Data;
 using System.Data.Common;
 using System.Xml.Linq;
 
+using CMS.DataEngine;
+
+using Kentico.Xperience.Admin.Base;
+using Kentico.Xperience.Admin.Base.UIPages;
+
 namespace Kentico.Xperience.Labs.ComponentRegistry;
 
 public partial class ComponentUsageService
