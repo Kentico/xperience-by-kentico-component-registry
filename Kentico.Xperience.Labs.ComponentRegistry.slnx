@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/examples/">
+    <Project Path="examples/AppHost/AppHost.csproj" />
     <Project Path="examples/DancingGoat/DancingGoat.csproj" />
   </Folder>
   <Folder Name="/src/">

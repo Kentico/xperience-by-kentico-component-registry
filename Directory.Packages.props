@@ -5,6 +5,15 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <DisableImplicitNuGetFallbackFolder>true</DisableImplicitNuGetFallbackFolder>
   </PropertyGroup>
+  <ItemGroup Label="Aspire">
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.1" />
+    <PackageVersion Include="Aspire.Hosting.SqlServer" Version="13.6.1" />
+    <PackageVersion Include="CommunityToolkit.Aspire.Hosting.MailPit" Version="13.6.0" />
+    <!-- Aspire 13.6.1 references vulnerable MessagePack 2.5.302 (GHSA-qhrr-8q5h-9q3h). -->
+    <PackageVersion Include="MessagePack" Version="2.5.303" />
+    <!-- Pin the new AppHost dependency without changing existing Xperience projects. -->
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.13" Condition="'$(MSBuildProjectName)' == 'AppHost'" />
+  </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Kentico.Xperience.Admin" Version="31.9.2" />
     <PackageVersion Include="Kentico.Xperience.WebApp" Version="31.9.2" />

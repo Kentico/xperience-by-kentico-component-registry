@@ -73,3 +73,119 @@ jobs:
             --configuration Release `
             --no-build `
             --no-restore
+
+  e2e-check:
+    name: E2E Type Check and Discovery
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: tests/e2e/package-lock.json
+      - run: npm ci
+        working-directory: tests/e2e
+      - run: npm run typecheck
+        working-directory: tests/e2e
+      - run: npx playwright test --list
+        working-directory: tests/e2e
+
+  # Licensed browser tests are skipped for forks and runs without the optional
+  # XPERIENCE_LICENSE_KEY repository/Dependabot secret. Static checks always run.
+  e2e:
+    name: E2E Browser Tests
+    runs-on: ubuntu-latest
+    needs: dotnet-format
+    defaults:
+      run:
+        shell: pwsh
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: Y
+          # Disposable service container only; never a shared database.
+          MSSQL_SA_PASSWORD: Pass@12345
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P Pass@12345 -C -Q 'SELECT 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+      mailpit:
+        image: axllent/mailpit:v1.31.6
+        ports:
+          - 1025:1025
+    env:
+      HAS_LICENSE: ${{ secrets.XPERIENCE_LICENSE_KEY != '' }}
+      ASPNETCORE_ENVIRONMENT: CI
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_NOLOGO: 1
+      DANCING_GOAT_BASE_URL: http://localhost:18319
+      ASPNETCORE_URLS: http://localhost:18319
+      XPERIENCE_ADMIN_PASSWORD: Pass@12345
+      E2E_WEB_SERVER_COMMAND: dotnet run --project ../../examples/DancingGoat --configuration Release --no-build --no-launch-profile
+    steps:
+      - uses: actions/checkout@v7
+      - name: Skip without license
+        if: env.HAS_LICENSE != 'true'
+        run: Write-Host "::notice title=E2E skipped::XPERIENCE_LICENSE_KEY is unavailable; browser tests were not run."
+      - uses: actions/setup-dotnet@v6
+        if: env.HAS_LICENSE == 'true'
+        with:
+          global-json-file: global.json
+      - uses: actions/setup-node@v6
+        if: env.HAS_LICENSE == 'true'
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            src/Kentico.Xperience.Labs.ComponentRegistry.Admin/Client/package-lock.json
+            tests/e2e/package-lock.json
+      - name: Create disposable database
+        if: env.HAS_LICENSE == 'true'
+        working-directory: examples/DancingGoat
+        env:
+          XPERIENCE_LICENSE_KEY: ${{ secrets.XPERIENCE_LICENSE_KEY }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $license = Join-Path $PWD '.e2e-license.txt'
+          try {
+            Set-Content $license $env:XPERIENCE_LICENSE_KEY -NoNewline
+            dotnet tool restore
+            if ($LASTEXITCODE -ne 0) { throw 'Tool restore failed.' }
+            dotnet kentico-xperience-dbmanager `
+              --server-name 'localhost,1433' `
+              --database-name 'xperience-by-kentico-component-registry' `
+              --username sa --password 'Pass@12345' `
+              --admin-password $env:XPERIENCE_ADMIN_PASSWORD `
+              --sample-website-domain 'localhost:18319' `
+              --sample-email-service-domain 'localhost:18319' `
+              --license-file $license
+            if ($LASTEXITCODE -ne 0) { throw 'Database initialization failed.' }
+          }
+          finally {
+            Remove-Item $license -ErrorAction SilentlyContinue
+          }
+      - name: Build with embedded admin client
+        if: env.HAS_LICENSE == 'true'
+        run: |
+          dotnet restore --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build --configuration Release --no-restore
+      - name: Install Playwright
+        if: env.HAS_LICENSE == 'true'
+        working-directory: tests/e2e
+        run: |
+          npm ci
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npx playwright install --with-deps chromium
+      - name: Run browser tests
+        if: env.HAS_LICENSE == 'true'
+        working-directory: tests/e2e
+        run: npm test
+      # Do not upload signed-in screenshots, traces, or storage state from this
+      # public repository. Reproduce failures locally to inspect those artifacts.
