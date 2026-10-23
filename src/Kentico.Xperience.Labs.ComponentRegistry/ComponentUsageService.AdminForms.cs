@@ -2,11 +2,6 @@ using System.Data;
 using System.Data.Common;
 using System.Xml.Linq;
 
-using CMS.DataEngine;
-
-using Kentico.Xperience.Admin.Base;
-using Kentico.Xperience.Admin.Base.UIPages;
-
 namespace Kentico.Xperience.Labs.ComponentRegistry;
 
 public partial class ComponentUsageService
@@ -215,7 +210,9 @@ public partial class ComponentUsageService
     private static string ToRelativeAdminPath(string adminPath) =>
         adminPath.StartsWith('/') ? adminPath[1..] : adminPath;
 
+#pragma warning disable S1135
     // TODO: Resolve UIFormFields directly when Xperience makes the UI form field editor tab public.
+#pragma warning restore S1135
     private static readonly Type uiFormFieldsPageType = typeof(UIFormEditSection).Assembly
         .GetType("Kentico.Xperience.Admin.Base.UIPages.UIFormFields", throwOnError: true)!;
 
