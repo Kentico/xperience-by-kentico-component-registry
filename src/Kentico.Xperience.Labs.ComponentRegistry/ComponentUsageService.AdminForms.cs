@@ -214,7 +214,8 @@ public partial class ComponentUsageService
     // TODO: Resolve UIFormFields directly when Xperience makes the UI form field editor tab public.
 #pragma warning restore S1135
     private static readonly Type uiFormFieldsPageType = typeof(UIFormEditSection).Assembly
-        .GetType("Kentico.Xperience.Admin.Base.UIPages.UIFormFields", throwOnError: true)!;
+        .GetType("Kentico.Xperience.Admin.Base.UIPages.UIFormFields")
+        ?? throw new TypeLoadException("The UI form fields admin page type could not be found.");
 
     // System modules (CMS, CMS.*) are not editable in the Modules application.
     private static bool IsCustomModule(string? moduleName) =>
