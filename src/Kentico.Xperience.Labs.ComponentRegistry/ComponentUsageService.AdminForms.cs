@@ -215,7 +215,7 @@ public partial class ComponentUsageService
     private static string ToRelativeAdminPath(string adminPath) =>
         adminPath.StartsWith('/') ? adminPath[1..] : adminPath;
 
-    // UIFormFields (the UI form field editor tab) is internal, so it's resolved by name.
+    // TODO: Resolve UIFormFields directly when Xperience makes the UI form field editor tab public.
     private static readonly Type uiFormFieldsPageType = typeof(UIFormEditSection).Assembly
         .GetType("Kentico.Xperience.Admin.Base.UIPages.UIFormFields", throwOnError: true)!;
 
